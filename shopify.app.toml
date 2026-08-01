@@ -2,6 +2,7 @@
 
 client_id = "c841ac2078d94b834b5eee19817f9458"
 name = "Sofenx AI Store Auditor"
+handle = "sofenx-ai-store-auditor"
 application_url = "https://ssa.sofenx.com"
 embedded = true
 
