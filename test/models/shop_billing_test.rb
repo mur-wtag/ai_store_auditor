@@ -39,4 +39,27 @@ class ShopBillingTest < ActiveSupport::TestCase
     assert_equal 0, shop.audits_used
     assert_equal 4, shop.audits_remaining
   end
+
+  test "refreshes an expired offline token before building an Admin client" do
+    shop = shops(:other_shop)
+    refreshed = false
+    shop.define_singleton_method(:refresh_token_if_expired!) do
+      refreshed = true
+      self.shopify_token = "refreshed-token"
+    end
+
+    client = shop.admin_client
+
+    assert refreshed
+    assert_equal "refreshed-token", client.send(:access_token)
+  end
+
+  test "turns an expired refresh token into a safe Admin API error" do
+    shop = shops(:other_shop)
+    shop.define_singleton_method(:refresh_token_if_expired!) { raise ShopifyApp::RefreshTokenExpiredError, "expired" }
+
+    error = assert_raises(ShopifyAdminClient::Error) { shop.admin_client }
+
+    assert_match(/access needs to be renewed/, error.message)
+  end
 end

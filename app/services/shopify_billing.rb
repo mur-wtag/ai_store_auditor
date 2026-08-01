@@ -3,9 +3,11 @@
 class ShopifyBilling
   class Error < StandardError; end
 
-  def initialize(shop, client: shop.admin_client)
+  def initialize(shop, client: nil)
     @shop = shop
-    @client = client
+    @client = client || shop.admin_client
+  rescue ShopifyAdminClient::Error => error
+    raise Error, error.message
   end
 
   def create_subscription!(plan:, return_url:)

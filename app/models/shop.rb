@@ -94,6 +94,9 @@ class Shop < ApplicationRecord
   end
 
   def admin_client
+    refresh_token_if_expired!
     ShopifyAdminClient.new(shopify_domain, access_token: shopify_token)
+  rescue ShopifyApp::RefreshTokenExpiredError, ShopifyAPI::Errors::HttpResponseError => error
+    raise ShopifyAdminClient::Error, "Shopify access needs to be renewed: #{error.message}"
   end
 end
