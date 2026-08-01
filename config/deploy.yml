@@ -2,16 +2,16 @@
 service: ai_store_auditor
 
 # Name of the container image (use your-user/app-name on external registries).
-image: ai_store_auditor
+image: mur-wtag/ai_store_auditor
 
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
-  # job:
-  #   hosts:
-  #     - 192.168.0.1
-  #   cmd: bin/jobs
+    - 169.58.64.224
+  job:
+    hosts:
+      - 169.58.64.224
+    cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
 # If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
@@ -20,9 +20,11 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  ssl: true
+  host: ssa.sofenx.com
+  app_port: 80
+  forward_headers: true
 
 # Where you keep your container images.
 registry:
@@ -40,10 +42,24 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - SHOPIFY_API_KEY
+    - SHOPIFY_API_SECRET
+    - AI_STORE_AUDITOR_DATABASE_PASSWORD
+    - OPENAI_API_KEY
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
-    SOLID_QUEUE_IN_PUMA: true
+    SOLID_QUEUE_IN_PUMA: false
+    DB_HOST: ai_store_auditor-db
+    HOST: https://ssa.sofenx.com
+    SHOPIFY_APP_URL: https://ssa.sofenx.com
+    SHOPIFY_APP_NAME: Sofenx AI Store Auditor
+    SHOPIFY_APP_SCOPES: read_products,read_online_store_navigation
+    SHOPIFY_ADMIN_API_VERSION: 2026-07
+    SHOPIFY_EMBEDDED_APP: true
+    SHOPIFY_MANAGED_WEBHOOKS: false
+    SHOPIFY_EXPIRING_OFFLINE_ACCESS_TOKENS: true
+    OPENAI_MODEL: gpt-5.6-terra
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
@@ -71,9 +87,13 @@ aliases:
 # version inside the asset_path.
 asset_path: /rails/public/assets
 
+volumes:
+  - "ai_store_auditor_storage:/rails/storage"
+
 # Configure the image builder.
 builder:
   arch: amd64
+  driver: docker
 
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
   # remote: ssh://docker@docker-builder-server
@@ -86,11 +106,22 @@ builder:
   #   - RAILS_MASTER_KEY
 
 # Use a different ssh user than root
-# ssh:
-#   user: app
+ssh:
+  config: "~/.ssh/config"
 
 # Use accessory services (secrets come from .kamal/secrets).
-# accessories:
+accessories:
+  db:
+    image: postgres:16
+    host: 169.58.64.224
+    env:
+      clear:
+        POSTGRES_USER: ai_store_auditor
+        POSTGRES_DB: ai_store_auditor_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
 #   db:
 #     image: mysql:8.0
 #     host: 192.168.0.2

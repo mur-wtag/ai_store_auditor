@@ -25,6 +25,9 @@
 /public/assets
 /node_modules
 /.shopify
+/.kamal/secrets
+shopify.app.*.toml
+!shopify.app.toml
 
 # Ignore key files for decrypting credentials and more.
 /config/*.key

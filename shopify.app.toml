@@ -1,0 +1,37 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "c841ac2078d94b834b5eee19817f9458"
+name = "Sofenx AI Store Auditor"
+application_url = "https://ssa.sofenx.com"
+embedded = true
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+topics = [ "app/uninstalled" ]
+uri = "/webhooks/app_uninstalled"
+
+[[webhooks.subscriptions]]
+compliance_topics = [ "customers/data_request" ]
+uri = "/webhooks/customers_data_request"
+
+[[webhooks.subscriptions]]
+compliance_topics = [ "customers/redact" ]
+uri = "/webhooks/customers_redact"
+
+[[webhooks.subscriptions]]
+compliance_topics = [ "shop/redact" ]
+uri = "/webhooks/shop_redact"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,read_online_store_navigation"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [ "https://ssa.sofenx.com/auth/shopify/callback" ]
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = false

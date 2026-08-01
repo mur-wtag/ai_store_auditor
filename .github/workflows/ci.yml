@@ -113,49 +113,75 @@ jobs:
           # REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:test:prepare test
 
-  system-test:
+  deploy_production:
+    name: Deploy production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [ scan_ruby, scan_js, lint, test ]
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      # redis:
-      #   image: valkey/valkey:8
-      #   ports:
-      #     - 6379:6379
-      #   options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+    timeout-minutes: 30
+    concurrency:
+      group: ai-store-auditor-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    env:
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      SHOPIFY_API_KEY: ${{ secrets.SHOPIFY_API_KEY }}
+      SHOPIFY_API_SECRET: ${{ secrets.SHOPIFY_API_SECRET }}
+      AI_STORE_AUDITOR_DATABASE_PASSWORD: ${{ secrets.AI_STORE_AUDITOR_DATABASE_PASSWORD }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
 
     steps:
-      - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libpq-dev
-
       - name: Checkout code
         uses: actions/checkout@v6
+
+      - name: Validate deployment secrets
+        run: |
+          missing=()
+          for name in \
+            RAILS_MASTER_KEY \
+            SHOPIFY_API_KEY \
+            SHOPIFY_API_SECRET \
+            AI_STORE_AUDITOR_DATABASE_PASSWORD \
+            DEPLOY_SSH_PRIVATE_KEY
+          do
+            if [ -z "${!name}" ]; then
+              missing+=("$name")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            printf '::error::Missing GitHub Actions secrets: %s\n' "${missing[*]}"
+            exit 1
+          fi
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
 
-      - name: Run System Tests
-        env:
-          RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test:system
+      - name: Configure deployment SSH key
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          cp .github/known_hosts ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore
+      - name: Configure Kamal secrets
+        run: |
+          install -d -m 700 .kamal
+          # shellcheck disable=SC2016
+          printf '%s\n' \
+            'RAILS_MASTER_KEY=$RAILS_MASTER_KEY' \
+            'SHOPIFY_API_KEY=$SHOPIFY_API_KEY' \
+            'SHOPIFY_API_SECRET=$SHOPIFY_API_SECRET' \
+            'AI_STORE_AUDITOR_DATABASE_PASSWORD=$AI_STORE_AUDITOR_DATABASE_PASSWORD' \
+            'POSTGRES_PASSWORD=$AI_STORE_AUDITOR_DATABASE_PASSWORD' \
+            'OPENAI_API_KEY=$OPENAI_API_KEY' \
+            > .kamal/secrets
+          chmod 600 .kamal/secrets
+
+      - name: Deploy with Kamal
+        run: bin/kamal deploy

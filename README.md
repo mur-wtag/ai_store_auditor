@@ -33,7 +33,6 @@ Requirements: Ruby 4.0.3, PostgreSQL, Node.js/npm, and a Shopify Partner develop
 
 ```bash
 cp .env.example .env
-cp shopify.app.example.toml shopify.app.toml
 bundle install
 npm install
 bin/rails db:prepare
@@ -41,7 +40,7 @@ bin/rails test
 bin/dev
 ```
 
-Link the Shopify app with `shopify app config link`, update the URLs, and then run `npm run shopify:dev`. Never copy production credentials from another app.
+The checked-in `shopify.app.toml` is the production app configuration. For local Shopify development, link a separate config filename instead of allowing the CLI to replace production URLs. Never copy credentials from another app.
 
 `SHOPIFY_MANAGED_WEBHOOKS=false` is useful when webhook subscriptions are managed declaratively in `shopify.app.toml`. Set only one lifecycle owner in production to avoid duplicate subscriptions.
 
@@ -63,6 +62,21 @@ npm run shopify:build
 ```
 
 The Shopify CLI build requires a linked `shopify.app.toml`; it is separate from Rails verification.
+
+## Production deployment
+
+Production runs at `https://ssa.sofenx.com` on the same VPS as Profit Dashboard, but uses separate Kamal web/job containers, a separate PostgreSQL accessory, and a separate storage volume.
+
+The `main` branch deploys only after CI passes. Configure these GitHub Actions repository secrets:
+
+- `DEPLOY_SSH_PRIVATE_KEY`: private key authorized for `root@169.58.64.224`
+- `RAILS_MASTER_KEY`: contents of this repository's ignored `config/master.key`
+- `SHOPIFY_API_KEY`: client ID of the Sofenx AI Store Auditor Partner app
+- `SHOPIFY_API_SECRET`: client secret of that same Partner app
+- `AI_STORE_AUDITOR_DATABASE_PASSWORD`: unique strong password for this app's PostgreSQL role
+- `OPENAI_API_KEY`: optional project-specific key; omit it to use deterministic audits only
+
+Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials. The workflow maps the app database password to PostgreSQL's initial password, so a separate `POSTGRES_PASSWORD` GitHub secret is not required.
 
 ## Explicitly deferred
 
