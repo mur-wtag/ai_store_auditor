@@ -33,5 +33,4 @@ use_legacy_install_flow = false
 redirect_urls = [ "https://ssa.sofenx.com/auth/shopify/callback" ]
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = false
