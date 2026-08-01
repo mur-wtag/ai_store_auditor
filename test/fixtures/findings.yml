@@ -1,0 +1,21 @@
+missing_description:
+  audit: completed_audit
+  category: product_pages
+  rule_key: product_description_depth
+  severity: high
+  status: open
+  resource_type: Product
+  resource_gid: gid://shopify/Product/1
+  resource_title: Travel Mug
+  resource_url: /products/travel-mug
+  title: Travel Mug needs a more useful description
+  explanation: The description has 12 words and may not answer buying questions.
+  recommendation: Add benefits, specifications, shipping, returns, and a short FAQ.
+  evidence:
+    word_count: 12
+    recommended_minimum: 120
+  estimated_lift_percent: 0.35
+  estimated_monthly_revenue_cents: 7000
+  confidence: 0.82
+  quick_win: true
+  fix_kind: copy

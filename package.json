@@ -1,0 +1,12 @@
+{
+  "name": "sofenx-ai-store-auditor",
+  "private": true,
+  "scripts": {
+    "shopify:dev": "shopify app dev",
+    "shopify:build": "shopify app build",
+    "shopify:deploy": "shopify app deploy"
+  },
+  "devDependencies": {
+    "@shopify/cli": "^4.6.0"
+  }
+}

@@ -1,0 +1,36 @@
+# Run `shopify app config link` to replace this placeholder with a linked config.
+client_id = "YOUR_SHOPIFY_CLIENT_ID"
+name = "Sofenx AI Store Auditor"
+application_url = "https://your-app.example.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,read_online_store_navigation"
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://your-app.example.com/auth/shopify/callback"
+]
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+topics = ["app/uninstalled"]
+uri = "/webhooks/app_uninstalled"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/data_request"]
+uri = "/webhooks/customers_data_request"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["customers/redact"]
+uri = "/webhooks/customers_redact"
+
+[[webhooks.subscriptions]]
+compliance_topics = ["shop/redact"]
+uri = "/webhooks/shop_redact"
+
+[build]
+include_config_on_deploy = false

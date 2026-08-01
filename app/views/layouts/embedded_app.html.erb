@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || ShopifyApp.configuration.application_name %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <% unless Rails.env.test? %>
+      <meta name="shopify-api-key" content="<%= ShopifyApp.configuration.api_key %>">
+      <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+    <% end %>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%= yield :head %>
+  </head>
+
+  <body class="embedded-app">
+    <%= yield %>
+  </body>
+</html>

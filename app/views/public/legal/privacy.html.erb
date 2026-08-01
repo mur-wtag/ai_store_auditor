@@ -1,0 +1,17 @@
+<% content_for :title, "Privacy · Sofenx AI Store Auditor" %>
+<main class="legal-shell">
+  <p class="eyebrow">Sofenx AI Store Auditor</p>
+  <h1>Privacy policy</h1>
+  <p>Last updated August 1, 2026. This development draft must be reviewed and completed with the operating company’s legal identity and contact details before public distribution.</p>
+  <nav class="legal-nav"><%= link_to "Privacy", privacy_path %><%= link_to "Terms", terms_path %><%= link_to "Support", support_path %></nav>
+  <h2>Data used by the app</h2>
+  <p>The MVP reads store profile information, products, collections, online-store navigation, and public homepage HTML to produce audit findings. It stores the merchant’s configured revenue baseline, scores, evidence, and recommendations.</p>
+  <h2>Data the MVP does not request</h2>
+  <p>The current access scopes do not request customers, orders, payments, or checkout data. Store content sent for optional AI enrichment excludes customer and order information.</p>
+  <h2>Deletion and retention</h2>
+  <p>Shop records and their audits are deleted when an uninstall or shop-redaction webhook is processed. Operational backups and logs require a documented production retention schedule before launch.</p>
+  <h2>Service providers</h2>
+  <p>Shopify supplies store data. OpenAI is optional and receives only the selected store-content findings needed to generate merchant guidance when an API key is configured. Hosting, email, monitoring, and analytics providers must be listed here before launch.</p>
+  <h2>Contact</h2>
+  <p>Add the production privacy contact and company address before publishing this policy.</p>
+</main>

@@ -1,0 +1,16 @@
+regular_shop:
+  shopify_domain: regular-shop.myshopify.com
+  shopify_token: test-token
+  access_scopes: read_products,read_online_store_navigation
+  shop_name: Regular Shop
+  shop_email: owner@example.com
+  primary_domain_url: https://regular-shop.example
+  currency_code: USD
+  monthly_revenue_cents: 2000000
+
+other_shop:
+  shopify_domain: other-shop.myshopify.com
+  shopify_token: other-test-token
+  access_scopes: read_products,read_online_store_navigation
+  shop_name: Other Shop
+  currency_code: USD

@@ -1,0 +1,24 @@
+completed_audit:
+  shop: regular_shop
+  status: completed
+  source: manual
+  started_at: <%= 2.minutes.ago %>
+  completed_at: <%= 1.minute.ago %>
+  overall_score: 78
+  category_scores:
+    homepage: 82
+    product_pages: 70
+    collections: 85
+    seo: 72
+    trust: 80
+    navigation: 88
+    accessibility: 69
+  estimated_monthly_opportunity_cents: 125000
+  critical_findings_count: 0
+  quick_wins_count: 1
+  resources_scanned_count: 12
+  snapshot_summary:
+    products: 10
+    collections: 1
+    menus: 2
+    homepage_available: true

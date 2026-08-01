@@ -1,0 +1,189 @@
+<% content_for :title, "Store health · Sofenx AI Store Auditor" %>
+<% if @audit&.status.in?(%w[queued running]) %>
+  <% content_for :head do %><meta http-equiv="refresh" content="5"><% end %>
+<% end %>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-lockup">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <div>
+        <strong>AI Store Auditor</strong>
+        <span><%= current_shop.shop_name.presence || current_shop.shopify_domain %></span>
+      </div>
+    </div>
+    <nav class="topnav" aria-label="App navigation">
+      <%= link_to "Dashboard", with_shopify_navigation_params(root_path), class: "active" %>
+      <%= link_to "Settings", with_shopify_navigation_params(edit_settings_path) %>
+    </nav>
+  </header>
+
+  <% flash.each do |type, message| %>
+    <div class="banner <%= type == 'alert' ? 'banner-critical' : 'banner-success' %>" role="status"><%= message %></div>
+  <% end %>
+
+  <main class="page-stack">
+    <section class="hero-row">
+      <div>
+        <p class="eyebrow">Store health</p>
+        <h1>Know what is holding growth back.</h1>
+        <p class="lede">Evidence-backed fixes across your catalog, homepage, SEO, trust, and navigation.</p>
+      </div>
+      <%= button_to(@audit ? "Run new audit" : "Scan my store", with_shopify_navigation_params(audits_path), method: :post,
+        class: "button button-primary", disabled: current_shop.audit_in_progress?) %>
+    </section>
+
+    <% if @audit.nil? %>
+      <section class="empty-state card">
+        <div class="empty-illustration" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <p class="eyebrow">Your first result takes a few minutes</p>
+        <h2>Turn store data into a prioritized action plan</h2>
+        <p>We’ll scan up to 100 recently updated products, 50 collections, navigation menus, and the public homepage. No customer or order data is requested.</p>
+        <%= button_to "Start first audit", with_shopify_navigation_params(audits_path), method: :post, class: "button button-primary" %>
+      </section>
+    <% elsif @audit.status.in?(%w[queued running]) %>
+      <section class="scan-state card">
+        <div class="scanner" aria-hidden="true"><span></span></div>
+        <div>
+          <p class="eyebrow">Audit <%= @audit.status %></p>
+          <h2>Reviewing your storefront</h2>
+          <p>Catalog structure, copy, media, SEO, navigation, accessibility signals, and homepage trust cues are being checked. This page refreshes automatically.</p>
+        </div>
+      </section>
+    <% elsif @audit.status == "failed" %>
+      <section class="banner banner-critical">
+        <strong>The audit could not finish.</strong>
+        <span><%= @audit.error_message %></span>
+      </section>
+    <% else %>
+      <section class="score-grid">
+        <article class="score-card score-card-primary">
+          <div>
+            <p class="metric-label">Store score</p>
+            <p class="score-number"><%= @audit.overall_score %><span>/100</span></p>
+          </div>
+          <div class="score-ring tone-<%= score_tone(@audit.overall_score) %>" style="--score: <%= @audit.overall_score %>">
+            <span><%= @audit.overall_score %></span>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Modeled opportunity</p>
+          <p class="metric-number"><%= audit_money(@audit.estimated_monthly_opportunity_cents, currency: current_shop.currency_code) %><span>/mo</span></p>
+          <p class="metric-note">Scenario estimate, capped at 20% of the revenue baseline.</p>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Critical issues</p>
+          <p class="metric-number"><%= @audit.critical_findings_count %></p>
+          <p class="metric-note"><%= @audit.findings.count %> total findings across <%= @audit.resources_scanned_count %> resources.</p>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Quick wins</p>
+          <p class="metric-number"><%= @audit.quick_wins_count %></p>
+          <p class="metric-note">Copy and settings changes that can be started now.</p>
+        </article>
+      </section>
+
+      <% if current_shop.monthly_revenue_cents.zero? %>
+        <section class="banner banner-info">
+          <div><strong>Add a monthly revenue baseline</strong><span>Opportunity values are currently $0 because no baseline is configured.</span></div>
+          <%= link_to "Add revenue", with_shopify_navigation_params(edit_settings_path), class: "button button-secondary" %>
+        </section>
+      <% end %>
+
+      <section class="content-grid">
+        <article class="card category-card">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">Health by category</p>
+              <h2>Where the store is strongest—and weakest</h2>
+            </div>
+            <span class="subdued"><%= @audit.completed_at.to_fs(:short) %></span>
+          </div>
+          <div class="category-list">
+            <% @audit.category_scores.each do |category, score| %>
+              <div class="category-row">
+                <span><%= category.humanize %></span>
+                <div class="progress" aria-label="<%= category.humanize %> score <%= score %> out of 100">
+                  <span class="tone-<%= score_tone(score) %>" style="width: <%= score %>%"></span>
+                </div>
+                <strong><%= score %></strong>
+              </div>
+            <% end %>
+          </div>
+        </article>
+
+        <aside class="card scan-summary">
+          <p class="eyebrow">Scan coverage</p>
+          <h2>What this report measured</h2>
+          <dl>
+            <div><dt>Products</dt><dd><%= @audit.snapshot_summary["products"] %></dd></div>
+            <div><dt>Collections</dt><dd><%= @audit.snapshot_summary["collections"] %></dd></div>
+            <div><dt>Menus</dt><dd><%= @audit.snapshot_summary["menus"] %></dd></div>
+            <div><dt>Homepage</dt><dd><%= @audit.snapshot_summary["homepage_available"] ? "Scanned" : "Unavailable" %></dd></div>
+          </dl>
+          <p class="metric-note">Performance, checkout, theme-file analysis, and predicted heatmaps are planned extensions, not included in this score.</p>
+        </aside>
+      </section>
+
+      <section class="findings-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Prioritized action plan</p>
+            <h2>Top fixes by severity and modeled impact</h2>
+          </div>
+          <% if @audit.ai_model.present? %><span class="ai-badge">AI guidance · <%= @audit.ai_model %></span><% end %>
+        </div>
+
+        <div class="finding-list">
+          <% @audit.top_findings.each_with_index do |finding, index| %>
+            <article class="finding card">
+              <div class="finding-rank"><%= index + 1 %></div>
+              <div class="finding-body">
+                <div class="finding-meta">
+                  <span class="badge badge-<%= finding.severity %>"><%= finding.severity %></span>
+                  <span><%= finding.category.humanize %></span>
+                  <% if finding.resource_title.present? %><span>· <%= finding.resource_title %></span><% end %>
+                </div>
+                <h3><%= finding.title %></h3>
+                <p><%= finding.explanation %></p>
+                <div class="recommendation"><strong>Recommended fix</strong><span><%= finding.recommendation %></span></div>
+
+                <details class="fix-panel">
+                  <summary>Open exact fix</summary>
+                  <% if finding.ai_draft.present? %>
+                    <p><%= finding.ai_draft["merchant_explanation"] %></p>
+                    <% if finding.ai_draft["suggested_copy"].present? %>
+                      <div class="copy-block"><span>Suggested copy</span><%= simple_format(finding.ai_draft["suggested_copy"]) %></div>
+                    <% end %>
+                    <ol><% Array(finding.ai_draft["implementation_steps"]).each do |step| %><li><%= step %></li><% end %></ol>
+                    <% if finding.ai_draft["caution"].present? %><p class="caution"><%= finding.ai_draft["caution"] %></p><% end %>
+                  <% else %>
+                    <p>AI copy is optional. Configure <code>OPENAI_API_KEY</code> and rerun the audit for generated copy; the evidence and recommendation above remain fully usable without it.</p>
+                  <% end %>
+                  <% if finding.evidence.present? %>
+                    <dl class="evidence-list">
+                      <% finding.evidence.each do |key, value| %><div><dt><%= evidence_label(key) %></dt><dd><%= value.is_a?(Array) ? value.join(", ") : value %></dd></div><% end %>
+                    </dl>
+                  <% end %>
+                </details>
+              </div>
+              <div class="finding-impact">
+                <span>Modeled impact</span>
+                <strong><%= audit_money(finding.estimated_monthly_revenue_cents, currency: current_shop.currency_code) %></strong>
+                <small><%= number_with_precision(finding.estimated_lift_percent, precision: 2, strip_insignificant_zeros: true) %>% scenario</small>
+                <%= form_with model: finding, url: with_shopify_navigation_params(finding_path(finding)), method: :patch do |form| %>
+                  <%= form.select :status, Finding::STATUSES.map { |status| [ status.humanize, status ] }, {}, class: "status-select", onchange: "this.form.requestSubmit()" %>
+                <% end %>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </main>
+</div>

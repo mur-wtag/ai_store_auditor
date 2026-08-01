@@ -1,0 +1,33 @@
+<% content_for :title, "Settings · Sofenx AI Store Auditor" %>
+
+<div class="app-shell app-shell-narrow">
+  <header class="topbar">
+    <div class="brand-lockup"><span class="brand-mark" aria-hidden="true">S</span><div><strong>AI Store Auditor</strong><span>Settings</span></div></div>
+    <nav class="topnav"><%= link_to "Dashboard", with_shopify_navigation_params(root_path) %><%= link_to "Settings", with_shopify_navigation_params(edit_settings_path), class: "active" %></nav>
+  </header>
+
+  <main class="page-stack">
+    <section class="hero-row compact">
+      <div><p class="eyebrow">Opportunity model</p><h1>Store settings</h1><p class="lede">Use a realistic monthly revenue baseline. This value is used only for scenario estimates.</p></div>
+    </section>
+
+    <% flash.each do |type, message| %><div class="banner <%= type == 'alert' ? 'banner-critical' : 'banner-success' %>"><%= message %></div><% end %>
+
+    <section class="card settings-card">
+      <%= form_with scope: :settings, url: with_shopify_navigation_params(settings_path), method: :patch do |form| %>
+        <div class="field">
+          <%= form.label :monthly_revenue, "Average monthly online-store revenue" %>
+          <div class="money-input"><span><%= current_shop.currency_code.presence || "USD" %></span><%= form.number_field :monthly_revenue, value: current_shop.monthly_revenue_cents / 100.0, min: 0, step: 0.01, required: true %></div>
+          <p>We cap the combined opportunity scenario at 20% of this value. It is an estimate for prioritization, not a forecast or guarantee.</p>
+        </div>
+        <div class="form-actions"><%= link_to "Cancel", with_shopify_navigation_params(root_path), class: "button button-secondary" %><%= form.submit "Save baseline", class: "button button-primary" %></div>
+      <% end %>
+    </section>
+
+    <section class="card privacy-card">
+      <p class="eyebrow">Data boundary</p>
+      <h2>Catalog data only</h2>
+      <p>This MVP reads products, collections, navigation, store profile data, and public homepage HTML. It does not request orders, customers, payment data, or checkout data.</p>
+    </section>
+  </main>
+</div>
