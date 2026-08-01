@@ -183,5 +183,26 @@ jobs:
             > .kamal/secrets
           chmod 600 .kamal/secrets
 
+      - name: Ensure PostgreSQL accessory is running
+        run: |
+          if ssh root@169.58.64.224 docker container inspect ai_store_auditor-db >/dev/null 2>&1; then
+            bin/kamal accessory start db
+          else
+            bin/kamal accessory boot db
+          fi
+
+          for attempt in {1..30}; do
+            if ssh root@169.58.64.224 \
+              docker exec ai_store_auditor-db \
+              pg_isready -U ai_store_auditor -d ai_store_auditor_production
+            then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo '::error::PostgreSQL did not become ready in time.'
+          exit 1
+
       - name: Deploy with Kamal
         run: bin/kamal deploy
