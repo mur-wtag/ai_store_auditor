@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_064600) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,6 +66,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_064600) do
 
   create_table "shops", force: :cascade do |t|
     t.string "access_scopes", default: "", null: false
+    t.datetime "billing_current_period_end"
+    t.datetime "billing_first_activated_at"
+    t.string "billing_pending_plan_key"
+    t.string "billing_pending_subscription_id"
+    t.string "billing_plan_key"
+    t.string "billing_status", default: "none", null: false
+    t.datetime "billing_subscription_created_at"
+    t.datetime "billing_synced_at"
+    t.boolean "billing_test", default: false, null: false
+    t.datetime "billing_trial_ends_at"
+    t.datetime "billing_usage_period_started_at"
     t.datetime "created_at", null: false
     t.string "currency_code"
     t.integer "current_score"
@@ -73,16 +84,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_064600) do
     t.datetime "last_audited_at"
     t.string "locale"
     t.bigint "monthly_revenue_cents", default: 0, null: false
+    t.boolean "partner_development_shop", default: false, null: false
     t.string "primary_domain_url"
     t.string "refresh_token"
     t.datetime "refresh_token_expires_at"
     t.jsonb "scan_preferences", default: {}, null: false
     t.string "shop_email"
     t.string "shop_name"
+    t.string "shopify_app_subscription_id"
     t.string "shopify_domain", null: false
     t.string "shopify_token", null: false
     t.datetime "uninstalled_at"
     t.datetime "updated_at", null: false
+    t.index ["shopify_app_subscription_id"], name: "index_shops_on_shopify_app_subscription_id", unique: true
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
   end
 

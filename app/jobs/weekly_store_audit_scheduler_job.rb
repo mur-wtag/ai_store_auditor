@@ -5,10 +5,10 @@ class WeeklyStoreAuditSchedulerJob < ApplicationJob
 
   def perform
     Shop.find_each do |shop|
-      next if shop.audit_in_progress?
-
-      audit = shop.audits.create!(source: "weekly")
+      audit = shop.reserve_audit!(source: "weekly")
       StoreAuditJob.perform_later(audit.id)
+    rescue Shop::BillingRequired, Shop::AuditLimitReached, Shop::AuditInProgress
+      next
     end
   end
 end

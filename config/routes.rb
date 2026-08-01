@@ -4,6 +4,10 @@ Rails.application.routes.draw do
   resources :audits, only: %i[create show]
   resources :findings, only: :update
   resource :settings, only: %i[edit update]
+  resources :plans, only: :index
+  resource :billing_subscription, only: :create do
+    get :callback
+  end
 
   scope module: :public do
     get "privacy", to: "legal#privacy", as: :privacy

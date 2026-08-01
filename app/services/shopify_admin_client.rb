@@ -19,6 +19,7 @@ class ShopifyAdminClient
           name
           email
           currencyCode
+          plan { partnerDevelopment }
           primaryDomain { host url }
         }
         products(first: $products, sortKey: UPDATED_AT, reverse: true) {
@@ -71,6 +72,68 @@ class ShopifyAdminClient
     GRAPHQL
 
     response.fetch("data")
+  end
+
+  def active_app_subscriptions
+    response = graphql(<<~GRAPHQL, {})
+      query ActiveAppSubscriptions {
+        currentAppInstallation {
+          activeSubscriptions {
+            id
+            name
+            status
+            test
+            trialDays
+            createdAt
+            currentPeriodEnd
+          }
+        }
+      }
+    GRAPHQL
+
+    response.dig("data", "currentAppInstallation", "activeSubscriptions") || []
+  end
+
+  def create_app_subscription(name:, amount:, return_url:, trial_days:, test:)
+    variables = {
+      name: name,
+      amount: amount,
+      return_url: return_url,
+      trial_days: trial_days,
+      test: test
+    }
+
+    response = graphql(<<~GRAPHQL, variables)
+      mutation CreateAppSubscription(
+        $name: String!
+        $amount: Decimal!
+        $return_url: URL!
+        $trial_days: Int!
+        $test: Boolean!
+      ) {
+        appSubscriptionCreate(
+          name: $name
+          returnUrl: $return_url
+          trialDays: $trial_days
+          test: $test
+          replacementBehavior: STANDARD
+          lineItems: [{
+            plan: {
+              appRecurringPricingDetails: {
+                price: { amount: $amount, currencyCode: USD }
+                interval: EVERY_30_DAYS
+              }
+            }
+          }]
+        ) {
+          appSubscription { id }
+          confirmationUrl
+          userErrors { field message }
+        }
+      }
+    GRAPHQL
+
+    response.dig("data", "appSubscriptionCreate") || {}
   end
 
   private

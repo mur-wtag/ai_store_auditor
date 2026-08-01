@@ -8,7 +8,8 @@ class ShopifyShopProfileSync
       shop_name: data["name"],
       shop_email: data["email"],
       currency_code: data["currencyCode"],
-      primary_domain_url: data.dig("primaryDomain", "url")
+      primary_domain_url: data.dig("primaryDomain", "url"),
+      partner_development_shop: data.dig("plan", "partnerDevelopment")
     )
   end
 end

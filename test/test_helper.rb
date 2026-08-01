@@ -11,5 +11,12 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+    def with_shopify_billing(service)
+      original_constructor = ShopifyBilling.method(:new)
+      ShopifyBilling.define_singleton_method(:new) { |*, **| service }
+      yield
+    ensure
+      ShopifyBilling.define_singleton_method(:new) { |*args, **kwargs| original_constructor.call(*args, **kwargs) }
+    end
   end
 end

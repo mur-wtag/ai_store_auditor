@@ -105,6 +105,21 @@ a { color: inherit; }
 .banner-success { border-color: #a9d7b8; background: #ecf8f0; }
 .banner-critical { border-color: #f0b5af; background: #fff0ee; color: #7a271a; }
 .banner-info { border-color: #b8cdf5; background: #f1f6ff; }
+.usage-pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 7px 11px; background: #fff; color: var(--brand); font-size: 12px; font-weight: 750; text-decoration: none; white-space: nowrap; }
+
+.plan-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
+.plan-card { display: flex; min-width: 0; flex-direction: column; padding: 22px; position: relative; }
+.plan-card-featured { border-color: #69ae82; box-shadow: 0 0 0 2px rgba(23, 107, 69, 0.09), var(--shadow); }
+.popular-badge { position: absolute; top: 14px; right: 14px; border-radius: 99px; padding: 4px 7px; background: var(--brand-soft); color: var(--brand); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.plan-card h2 { margin: 5px 0 8px; color: var(--muted); font-size: 14px; font-weight: 650; }
+.plan-card h2 span { color: var(--ink); font-size: 30px; letter-spacing: -.04em; }
+.plan-description { min-height: 66px; margin: 0; color: var(--muted); }
+.plan-card ul { display: grid; gap: 9px; margin: 18px 0 24px; padding: 0; list-style: none; }
+.plan-card li { padding-left: 20px; position: relative; }
+.plan-card li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: 850; }
+.plan-card form, .plan-card form .button, .plan-card > .button { width: 100%; margin-top: auto; }
+.button-disabled, .button:disabled { opacity: .58; cursor: not-allowed; }
+.billing-footnote { margin: 0; color: var(--muted); font-size: 12px; text-align: center; }
 
 .score-grid { display: grid; grid-template-columns: 1.25fr repeat(3, 1fr); gap: 14px; }
 .score-card, .metric-card { min-height: 162px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: var(--shadow); padding: 21px; }
@@ -220,6 +235,7 @@ a { color: inherit; }
 .legal-nav a { color: var(--brand); font-weight: 700; }
 
 @media (max-width: 900px) {
+  .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .score-grid { grid-template-columns: repeat(2, 1fr); }
   .content-grid { grid-template-columns: 1fr; }
   .finding { grid-template-columns: 40px minmax(0, 1fr); }
@@ -235,6 +251,8 @@ a { color: inherit; }
   .hero-row { align-items: stretch; flex-direction: column; padding-top: 20px; }
   .hero-row form, .hero-row .button { width: 100%; }
   .score-grid { grid-template-columns: 1fr; }
+  .plan-grid { grid-template-columns: 1fr; }
+  .plan-description { min-height: 0; }
   .score-card, .metric-card { min-height: 132px; }
   .score-card-primary { min-height: 150px; }
   .category-row { grid-template-columns: 105px minmax(70px, 1fr) 30px; gap: 9px; }

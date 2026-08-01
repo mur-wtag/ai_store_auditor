@@ -12,6 +12,7 @@ The first slice follows the product brief’s recommended launch workflow:
 4. The dashboard shows a 0–100 store score, category scores, critical issues, quick wins, and a capped monthly opportunity scenario.
 5. Optional OpenAI Responses API enrichment adds exact copy and implementation steps to the top ten findings. The audit still works without OpenAI.
 6. Weekly audits are scheduled through Solid Queue in production.
+7. Shopify subscription billing offers Starter ($19/4 audits), Growth ($49/15), and Pro ($99/31), each measured over a rolling 30-day allowance period.
 
 No customers, orders, payments, or checkout data are requested by the MVP scopes.
 
@@ -63,6 +64,12 @@ npm run shopify:build
 
 The Shopify CLI build requires a linked `shopify.app.toml`; it is separate from Rails verification.
 
+## Billing
+
+The app uses Shopify's GraphQL Billing API and treats `currentAppInstallation.activeSubscriptions` as the source of truth. First-time subscribers receive a 7-day trial. Partner development stores automatically use test charges; live stores use real charges. Plan changes create a replacement subscription that the merchant must approve in Shopify.
+
+The first install audit is a free preview. Later manual and weekly audits share the selected plan allowance, and failed audits do not consume it. Agency is intentionally unavailable until one account can safely manage multiple shop installations.
+
 ## Production deployment
 
 Production runs at `https://ssa.sofenx.com` on the same VPS as Profit Dashboard, but uses separate Kamal web/job containers, a separate PostgreSQL accessory, and a separate storage volume.
@@ -87,8 +94,7 @@ Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials.
 - Predicted heatmaps
 - Theme app extension fixes
 - Automatic write-back of generated copy
-- Shopify subscription billing and plan limits
 - Weekly email delivery
 - Analytics proving which recommendations led to measured outcomes
 
-These are not included in the current score or presented as complete. Billing, legal text, provider agreements, production infrastructure, monitoring, backup retention, and Shopify App Store QA remain launch gates.
+These are not included in the current score or presented as complete. Provider agreements, monitoring, backup retention, pricing QA, and Shopify App Store review remain launch gates.

@@ -7,6 +7,14 @@ regular_shop:
   primary_domain_url: https://regular-shop.example
   currency_code: USD
   monthly_revenue_cents: 2000000
+  billing_plan_key: starter
+  billing_status: active
+  shopify_app_subscription_id: gid://shopify/AppSubscription/1001
+  billing_subscription_created_at: <%= 5.days.ago %>
+  billing_current_period_end: <%= 25.days.from_now %>
+  billing_first_activated_at: <%= 5.days.ago %>
+  billing_usage_period_started_at: <%= 5.days.ago %>
+  billing_synced_at: <%= 1.minute.ago %>
 
 other_shop:
   shopify_domain: other-shop.myshopify.com
@@ -14,3 +22,11 @@ other_shop:
   access_scopes: read_products,read_online_store_navigation
   shop_name: Other Shop
   currency_code: USD
+  billing_plan_key: starter
+  billing_status: active
+  shopify_app_subscription_id: gid://shopify/AppSubscription/1002
+  billing_subscription_created_at: <%= 5.days.ago %>
+  billing_current_period_end: <%= 25.days.from_now %>
+  billing_first_activated_at: <%= 5.days.ago %>
+  billing_usage_period_started_at: <%= 5.days.ago %>
+  billing_synced_at: <%= 1.minute.ago %>
