@@ -94,6 +94,18 @@ class ShopifyAdminClient
     response.dig("data", "currentAppInstallation", "activeSubscriptions") || []
   end
 
+  def partner_development_shop?
+    response = graphql(<<~GRAPHQL, {})
+      query ShopBillingContext {
+        shop {
+          plan { partnerDevelopment }
+        }
+      }
+    GRAPHQL
+
+    response.dig("data", "shop", "plan", "partnerDevelopment") == true
+  end
+
   def create_app_subscription(name:, amount:, return_url:, trial_days:, test:)
     variables = {
       name: name,

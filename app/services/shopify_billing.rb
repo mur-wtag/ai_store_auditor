@@ -9,12 +9,15 @@ class ShopifyBilling
   end
 
   def create_subscription!(plan:, return_url:)
+    test_charge = client.partner_development_shop?
+    shop.update!(partner_development_shop: test_charge) if shop.partner_development_shop? != test_charge
+
     payload = client.create_app_subscription(
       name: plan.subscription_name,
       amount: plan.price,
       return_url: return_url,
       trial_days: shop.billing_first_activated_at? ? 0 : BillingPlan::TRIAL_DAYS,
-      test: shop.partner_development_shop?
+      test: test_charge
     )
 
     errors = Array(payload["userErrors"])

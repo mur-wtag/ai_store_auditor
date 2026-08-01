@@ -3,7 +3,7 @@
 require "test_helper"
 
 class ShopifyBillingTest < ActiveSupport::TestCase
-  FakeClient = Struct.new(:subscriptions, :create_payload, :create_arguments, keyword_init: true) do
+  FakeClient = Struct.new(:subscriptions, :create_payload, :create_arguments, :development_shop, keyword_init: true) do
     def active_app_subscriptions
       subscriptions
     end
@@ -12,12 +12,17 @@ class ShopifyBillingTest < ActiveSupport::TestCase
       self.create_arguments = arguments
       create_payload
     end
+
+
+    def partner_development_shop?
+      development_shop == true
+    end
   end
 
   test "creates a test subscription with a first-time trial for a development shop" do
     shop = shops(:other_shop)
     shop.update!(partner_development_shop: true, billing_first_activated_at: nil)
-    client = FakeClient.new(create_payload: {
+    client = FakeClient.new(development_shop: true, create_payload: {
       "userErrors" => [],
       "confirmationUrl" => "https://example.myshopify.com/admin/charges/confirm",
       "appSubscription" => { "id" => "gid://shopify/AppSubscription/2001" }
