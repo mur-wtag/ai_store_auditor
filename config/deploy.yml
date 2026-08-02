@@ -63,7 +63,7 @@ env:
     OPENAI_MODEL: gpt-5.6-terra
     MAIL_FROM: Sofenx AI Store Auditor <no-reply@sofenx.com>
     SUPPORT_EMAIL: support@sofenx.com
-    AWS_SES_SMTP_ADDRESS: email-smtp.us-east-1.amazonaws.com
+    AWS_SES_SMTP_ADDRESS: email-smtp.us-east-2.amazonaws.com
     AWS_SES_SMTP_PORT: 587
     SMTP_RAISE_DELIVERY_ERRORS: true
 

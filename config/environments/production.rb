@@ -64,7 +64,7 @@ Rails.application.configure do
   end
 
   config.action_mailer.smtp_settings = {
-    address: ENV.fetch("AWS_SES_SMTP_ADDRESS", "email-smtp.us-east-1.amazonaws.com"),
+    address: ENV.fetch("AWS_SES_SMTP_ADDRESS", "email-smtp.us-east-2.amazonaws.com"),
     port: ENV.fetch("AWS_SES_SMTP_PORT", 587).to_i,
     user_name: smtp_credentials.fetch(:user_name),
     password: smtp_credentials.fetch(:password),
