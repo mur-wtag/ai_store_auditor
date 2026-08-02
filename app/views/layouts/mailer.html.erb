@@ -2,12 +2,73 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
     <style>
-      /* Email styles need to be inline */
+      body, table, td, p, a { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+      body { margin: 0; padding: 0; background: #f3f6f2; color: #17211b; }
+      table { border-collapse: collapse; }
+      h1 { margin: 0 0 16px; color: #17211b; font-size: 29px; line-height: 1.2; letter-spacing: -0.7px; }
+      h2 { margin: 0 0 10px; color: #17211b; font-size: 18px; line-height: 1.35; }
+      p { margin: 0 0 16px; color: #526058; font-size: 15px; line-height: 1.65; }
+      ul { margin: 0; padding-left: 20px; color: #526058; }
+      li { margin-bottom: 9px; line-height: 1.5; }
+      .email-shell { width: 100%; background: #f3f6f2; }
+      .email-container { width: 100%; max-width: 640px; }
+      .card { background: #ffffff; border: 1px solid #dfe6df; border-radius: 0 0 16px 16px; }
+      .eyebrow { margin: 0 0 8px; color: #176b45; font-size: 11px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; }
+      .button { display: inline-block; padding: 12px 20px; border-radius: 9px; background: #176b45; color: #ffffff !important; font-size: 15px; font-weight: 750; text-decoration: none; }
+      .metric { padding: 18px; border: 1px solid #dfe6df; border-radius: 12px; background: #f8faf8; }
+      .metric-label { margin: 0 0 5px; color: #66726b; font-size: 11px; font-weight: 750; letter-spacing: .6px; text-transform: uppercase; }
+      .metric-value { margin: 0; color: #17211b; font-size: 28px; font-weight: 800; line-height: 1.15; }
+      .callout { padding: 17px 18px; border-left: 4px solid #54a975; border-radius: 0 10px 10px 0; background: #f3f9f5; }
+      .callout-warning { border-left-color: #d69e2e; background: #fff8e8; }
+      .callout-critical { border-left-color: #d14b3d; background: #fff0ee; }
+      .muted { color: #66726b; font-size: 13px; }
+      .footer-link { color: #176b45 !important; }
+      @media only screen and (max-width: 640px) {
+        .page-padding { padding-left: 14px !important; padding-right: 14px !important; }
+        .content-padding { padding: 28px 22px !important; }
+        h1 { font-size: 25px !important; }
+        .metric-cell { display: block !important; width: 100% !important; padding: 0 0 10px !important; }
+      }
     </style>
   </head>
-
   <body>
-    <%= yield %>
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+      <%= content_for?(:preheader) ? yield(:preheader) : "Store health insights from Sofenx AI Store Auditor." %>
+    </div>
+
+    <table role="presentation" class="email-shell" width="100%">
+      <tr>
+        <td align="center" class="page-padding" style="padding: 30px 22px 42px;">
+          <table role="presentation" class="email-container" width="640">
+            <tr>
+              <td style="padding: 20px 24px; border-radius: 16px 16px 0 0; background: linear-gradient(145deg, #163f2c, #0b2d1e);">
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td width="46"><span style="display:inline-block;width:34px;height:34px;border-radius:10px;background:#217b52;color:#fff;font-size:17px;font-weight:800;line-height:34px;text-align:center;">S</span></td>
+                    <td style="color:#fff;font-size:17px;font-weight:750;letter-spacing:-.2px;">Sofenx AI Store Auditor</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="card content-padding" style="padding: 40px 42px; border-top: 0;">
+                <%= yield %>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding: 22px 24px 0;">
+                <% merchant_name = @shop&.shop_name.presence || @shop&.shopify_domain || @shop_name %>
+                <% if merchant_name.present? %><p class="muted" style="margin-bottom:8px;">Sent for <strong><%= merchant_name %></strong></p><% end %>
+                <p class="muted" style="margin-bottom:7px;">Need help? <a class="footer-link" href="mailto:<%= support_email %>"><%= support_email %></a></p>
+                <p class="muted" style="margin-bottom:0;">We will never ask for your Shopify password, payment card, or API keys by email.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

@@ -8,6 +8,7 @@ module Shopify
       shop = Shop.find_by!(shopify_domain: shop_domain)
       ShopifyShopProfileSync.call(shop)
       reconcile_billing(shop)
+      MerchantEmailNotifications.welcome(shop.reload)
       return unless shop.free_preview_available?
 
       audit = shop.reserve_audit!(source: "install")

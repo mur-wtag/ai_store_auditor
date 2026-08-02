@@ -1,0 +1,7 @@
+Your audit allowance is used.
+
+<%= @shop.shop_name.presence || @shop.shopify_domain %> has used <%= @shop.audits_used %> of <%= @shop.entitlement_plan.audit_limit %> audits on the <%= @shop.entitlement_plan.name %> plan.
+
+Allowance refreshes around <%= @shop.usage_period_ends_at.to_fs(:long) %>. Existing results remain available.
+
+Compare plans: <%= @plans_url %>

@@ -1,0 +1,13 @@
+<% content_for :preheader, "Your paid plan trial ends in the next three days." %>
+<p class="eyebrow">Trial reminder</p>
+<h1>Your <%= @shop.billing_plan.name %> trial ends soon.</h1>
+<p>The trial for <strong><%= @shop.shop_name.presence || @shop.shopify_domain %></strong> ends on <strong><%= @shop.billing_trial_ends_at.to_fs(:long) %></strong>.</p>
+
+<div class="metric" style="margin:24px 0;">
+  <p class="metric-label">After the trial</p>
+  <p class="metric-value">$<%= @shop.billing_plan.price %><span style="font-size:13px;color:#66726b;"> / month</span></p>
+  <p class="muted" style="margin:6px 0 0;">Charged through Shopify unless the subscription is cancelled.</p>
+</div>
+
+<p>No action is needed to continue. You can review plan details in Shopify at any time.</p>
+<p style="margin:26px 0 0;"><a class="button" href="<%= @plans_url %>">Review subscription</a></p>

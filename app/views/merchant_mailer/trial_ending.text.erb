@@ -1,0 +1,7 @@
+Your <%= @shop.billing_plan.name %> trial ends soon.
+
+The trial for <%= @shop.shop_name.presence || @shop.shopify_domain %> ends on <%= @shop.billing_trial_ends_at.to_fs(:long) %>.
+
+After the trial: $<%= @shop.billing_plan.price %>/month, charged through Shopify unless the subscription is cancelled.
+
+Review subscription: <%= @plans_url %>

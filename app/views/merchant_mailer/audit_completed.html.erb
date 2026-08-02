@@ -1,0 +1,19 @@
+<% content_for :preheader, "Your new store score and prioritized fixes are ready." %>
+<p class="eyebrow"><%= @audit.source.humanize %> audit complete</p>
+<h1>Your new action plan is ready.</h1>
+<p>We finished reviewing <strong><%= @shop.shop_name.presence || @shop.shopify_domain %></strong>. Start with the highest-priority evidence, then rerun the audit to measure progress.</p>
+
+<table role="presentation" width="100%" style="margin:24px 0;">
+  <tr>
+    <td class="metric-cell" width="33%" style="padding-right:7px;"><div class="metric"><p class="metric-label">Store score</p><p class="metric-value"><%= @audit.overall_score %><span style="font-size:13px;color:#66726b;">/100</span></p></div></td>
+    <td class="metric-cell" width="33%" style="padding:0 4px;"><div class="metric"><p class="metric-label">Critical</p><p class="metric-value"><%= @audit.critical_findings_count %></p></div></td>
+    <td class="metric-cell" width="33%" style="padding-left:7px;"><div class="metric"><p class="metric-label">Quick wins</p><p class="metric-value"><%= @audit.quick_wins_count %></p></div></td>
+  </tr>
+</table>
+
+<% if @findings.any? %>
+  <h2>Start with these fixes</h2>
+  <ul><% @findings.each do |finding| %><li><strong><%= finding.title %></strong> — <%= finding.recommendation %></li><% end %></ul>
+<% end %>
+
+<p style="margin:28px 0 0;"><a class="button" href="<%= @dashboard_url %>">Review the full audit</a></p>

@@ -54,12 +54,18 @@ env:
     HOST: https://ssa.sofenx.com
     SHOPIFY_APP_URL: https://ssa.sofenx.com
     SHOPIFY_APP_NAME: Sofenx AI Store Auditor
+    SHOPIFY_APP_HANDLE: sofenx-ai-store-auditor
     SHOPIFY_APP_SCOPES: read_products,read_online_store_navigation
     SHOPIFY_ADMIN_API_VERSION: 2026-07
     SHOPIFY_EMBEDDED_APP: true
     SHOPIFY_MANAGED_WEBHOOKS: false
     SHOPIFY_EXPIRING_OFFLINE_ACCESS_TOKENS: true
     OPENAI_MODEL: gpt-5.6-terra
+    MAIL_FROM: Sofenx AI Store Auditor <no-reply@sofenx.com>
+    SUPPORT_EMAIL: support@sofenx.com
+    AWS_SES_SMTP_ADDRESS: email-smtp.us-east-1.amazonaws.com
+    AWS_SES_SMTP_PORT: 587
+    SMTP_RAISE_DELIVERY_ERRORS: true
 
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3

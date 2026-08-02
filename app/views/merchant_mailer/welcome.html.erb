@@ -1,0 +1,12 @@
+<% content_for :preheader, "Your first evidence-backed storefront audit is being prepared." %>
+<p class="eyebrow">Welcome aboard</p>
+<h1>Your store health workspace is ready.</h1>
+<p>Hi <%= @shop.shop_name.presence || @shop.shopify_domain %>,</p>
+<p>Sofenx AI Store Auditor is installed for <strong><%= @shop.shopify_domain %></strong>. Your first audit checks catalog quality, SEO, trust, navigation, accessibility signals, and the public homepage.</p>
+
+<div class="callout" style="margin:24px 0;">
+  <h2 style="margin-bottom:6px;">What happens next</h2>
+  <p style="margin:0;">We’ll turn the scan into a store score and a prioritized action plan. No customer, order, payment, or checkout data is requested.</p>
+</div>
+
+<p style="margin:26px 0 0;"><a class="button" href="<%= @dashboard_url %>">Open store dashboard</a></p>

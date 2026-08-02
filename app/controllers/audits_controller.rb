@@ -6,6 +6,7 @@ class AuditsController < AuthenticatedController
     StoreAuditJob.perform_later(audit.id)
     redirect_to with_shopify_navigation_params(audit_path(audit)), notice: "Store audit started."
   rescue Shop::AuditLimitReached => error
+    MerchantEmailNotifications.audit_limit_reached(current_shop)
     redirect_to with_shopify_navigation_params(plans_path), alert: error.message
   rescue Shop::AuditInProgress => error
     redirect_to with_shopify_navigation_params(root_path), alert: error.message

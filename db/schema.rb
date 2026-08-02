@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_043000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,10 +18,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
     t.string "ai_model"
     t.jsonb "category_scores", default: {}, null: false
     t.datetime "completed_at"
+    t.datetime "completion_email_sent_at"
     t.datetime "created_at", null: false
     t.integer "critical_findings_count", default: 0, null: false
     t.text "error_message"
     t.bigint "estimated_monthly_opportunity_cents", default: 0, null: false
+    t.datetime "failure_email_sent_at"
     t.integer "overall_score"
     t.integer "quick_wins_count", default: 0, null: false
     t.integer "resources_scanned_count", default: 0, null: false
@@ -66,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
 
   create_table "shops", force: :cascade do |t|
     t.string "access_scopes", default: "", null: false
+    t.datetime "audit_limit_email_period_started_at"
     t.datetime "billing_current_period_end"
     t.datetime "billing_first_activated_at"
     t.string "billing_pending_plan_key"
@@ -94,8 +97,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_01_100000) do
     t.string "shopify_app_subscription_id"
     t.string "shopify_domain", null: false
     t.string "shopify_token", null: false
+    t.datetime "trial_ending_email_sent_at"
     t.datetime "uninstalled_at"
     t.datetime "updated_at", null: false
+    t.datetime "welcome_email_sent_at"
     t.index ["shopify_app_subscription_id"], name: "index_shops_on_shopify_app_subscription_id", unique: true
     t.index ["shopify_domain"], name: "index_shops_on_shopify_domain", unique: true
   end

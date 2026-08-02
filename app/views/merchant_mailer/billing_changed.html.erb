@@ -1,0 +1,17 @@
+<% content_for :preheader, @shop.billing_active? ? "Your #{@shop.billing_plan.name} plan is active." : "Your store is now using the Free plan." %>
+<p class="eyebrow">Plan update</p>
+<% if @shop.billing_active? %>
+  <h1><%= @shop.billing_plan.name %> is now active.</h1>
+  <p><% if @previous_plan_name.present? %>Your plan changed from <strong><%= @previous_plan_name %></strong> to <strong><%= @shop.billing_plan.name %></strong>.<% else %>Thanks for upgrading <strong><%= @shop.shop_name.presence || @shop.shopify_domain %></strong>.<% end %></p>
+  <div class="metric" style="margin:24px 0;">
+    <p class="metric-label">Current allowance</p>
+    <p class="metric-value"><%= @shop.billing_plan.audit_limit %> audits</p>
+    <p class="muted" style="margin:6px 0 0;">Every 30 days · top 10 findings with AI-assisted guidance</p>
+  </div>
+  <% if @shop.billing_trial? %><p>Your trial runs through <strong><%= @shop.billing_trial_ends_at.to_fs(:long) %></strong>. Shopify billing begins after the trial unless the subscription is cancelled.</p><% end %>
+<% else %>
+  <h1>Your store is now on Free.</h1>
+  <p>Your previous paid plan<%= " (#{@previous_plan_name})" if @previous_plan_name.present? %> is no longer active. The app remains available with one audit every 30 days and the top five evidence-backed fixes.</p>
+<% end %>
+
+<p style="margin:26px 0 0;"><a class="button" href="<%= @plans_url %>">Review plans</a></p>

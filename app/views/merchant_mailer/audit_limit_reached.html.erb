@@ -1,0 +1,13 @@
+<% content_for :preheader, "Your current audit allowance has been used for this period." %>
+<p class="eyebrow">Usage update</p>
+<h1>Your audit allowance is used.</h1>
+<p><strong><%= @shop.shop_name.presence || @shop.shopify_domain %></strong> has used all <%= @shop.entitlement_plan.audit_limit %> audits included with the <%= @shop.entitlement_plan.name %> plan for this 30-day period.</p>
+
+<div class="metric" style="margin:24px 0;">
+  <p class="metric-label">Current usage</p>
+  <p class="metric-value"><%= @shop.audits_used %> / <%= @shop.entitlement_plan.audit_limit %></p>
+  <p class="muted" style="margin:6px 0 0;">Allowance refreshes around <%= @shop.usage_period_ends_at.to_fs(:long) %></p>
+</div>
+
+<p>Existing audit results remain available. You can wait for the allowance to refresh or choose a plan with more audits.</p>
+<p style="margin:26px 0 0;"><a class="button" href="<%= @plans_url %>">Compare plans</a></p>

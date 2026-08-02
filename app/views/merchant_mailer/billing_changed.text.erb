@@ -1,0 +1,8 @@
+Plan update
+
+<% if @shop.billing_active? %><%= @shop.billing_plan.name %> is now active for <%= @shop.shop_name.presence || @shop.shopify_domain %>.
+Allowance: <%= @shop.billing_plan.audit_limit %> audits every 30 days, with the top 10 findings and AI-assisted guidance.
+<% if @shop.billing_trial? %>Trial ends: <%= @shop.billing_trial_ends_at.to_fs(:long) %>
+<% end %><% else %>Your previous paid plan is no longer active. Your store is now using Free: one audit every 30 days and the top five evidence-backed fixes.
+<% end %>
+Review plans: <%= @plans_url %>

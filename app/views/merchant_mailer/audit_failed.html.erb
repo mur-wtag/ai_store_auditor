@@ -1,0 +1,10 @@
+<% content_for :preheader, "Your store audit could not finish, but your previous results are safe." %>
+<p class="eyebrow">Audit update</p>
+<h1>Your store audit needs another try.</h1>
+<p>We couldn’t complete the latest scan for <strong><%= @shop.shop_name.presence || @shop.shopify_domain %></strong>. Your previous audit and finding statuses remain safe.</p>
+
+<div class="callout callout-warning" style="margin:24px 0;">
+  <p style="margin:0;">Open the app and retry when convenient. If the problem continues, reply to this email and we’ll investigate.</p>
+</div>
+
+<p style="margin:26px 0 0;"><a class="button" href="<%= @dashboard_url %>">Return to dashboard</a></p>

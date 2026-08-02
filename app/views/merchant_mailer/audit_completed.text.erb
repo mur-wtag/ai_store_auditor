@@ -1,0 +1,11 @@
+Your <%= @audit.source.humanize.downcase %> store audit is ready.
+
+Store score: <%= @audit.overall_score %>/100
+Critical issues: <%= @audit.critical_findings_count %>
+Quick wins: <%= @audit.quick_wins_count %>
+
+<% if @findings.any? %>Start with these fixes:
+<% @findings.each do |finding| %>- <%= finding.title %>: <%= finding.recommendation %>
+<% end %>
+<% end %>
+Review the full audit: <%= @dashboard_url %>

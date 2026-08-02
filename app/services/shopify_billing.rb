@@ -40,6 +40,8 @@ class ShopifyBilling
   end
 
   def reconcile!
+    previous_status = shop.billing_status
+    previous_plan_key = shop.billing_plan_key
     subscriptions = client.active_app_subscriptions
     subscription = subscriptions.find { |candidate| BillingPlan.from_subscription_name(candidate["name"]) }
 
@@ -52,6 +54,12 @@ class ShopifyBilling
     end
 
     shop.reload
+    MerchantEmailNotifications.billing_changed(
+      shop,
+      previous_status: previous_status,
+      previous_plan_key: previous_plan_key
+    )
+    shop
   rescue ShopifyAdminClient::Error => error
     raise Error, error.message
   end

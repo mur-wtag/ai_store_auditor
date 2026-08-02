@@ -13,6 +13,7 @@ The first slice follows the product brief’s recommended launch workflow:
 5. Optional OpenAI Responses API enrichment adds exact copy and implementation steps to the top ten findings. The audit still works without OpenAI.
 6. Weekly audits are scheduled through Solid Queue in production.
 7. Launch pricing offers Free ($0/1 audit), Starter ($9.99/4), Growth ($19.99/15), and Pro ($39.99/31), each measured over a rolling 30-day allowance period.
+8. Transactional email covers welcome, completed and failed audits, billing changes, trial reminders, allowance limits, and uninstall confirmation through the shared Sofenx AWS SES SMTP account.
 
 No customers, orders, payments, or checkout data are requested by the MVP scopes.
 
@@ -83,7 +84,7 @@ The `main` branch deploys only after CI passes. Configure these GitHub Actions r
 - `AI_STORE_AUDITOR_DATABASE_PASSWORD`: unique strong password for this app's PostgreSQL role
 - `OPENAI_API_KEY`: optional project-specific key; omit it to use deterministic audits only
 
-Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials. The workflow maps the app database password to PostgreSQL's initial password, so a separate `POSTGRES_PASSWORD` GitHub secret is not required.
+Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials. The workflow maps the app database password to PostgreSQL's initial password, so a separate `POSTGRES_PASSWORD` GitHub secret is not required. The shared Sofenx AWS SES SMTP username and password are stored in `config/credentials.yml.enc` and protected by this app's existing `RAILS_MASTER_KEY`; no additional GitHub secrets are required for email.
 
 ## Explicitly deferred
 
@@ -94,7 +95,7 @@ Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials.
 - Predicted heatmaps
 - Theme app extension fixes
 - Automatic write-back of generated copy
-- Weekly email delivery
+- Merchant-controlled email notification preferences and digest frequency
 - Analytics proving which recommendations led to measured outcomes
 
 These are not included in the current score or presented as complete. Provider agreements, monitoring, backup retention, pricing QA, and Shopify App Store review remain launch gates.

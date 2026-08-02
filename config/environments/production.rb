@@ -50,22 +50,27 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = ENV.fetch("SMTP_RAISE_DELIVERY_ERRORS", "true") == "true"
+  config.action_mailer.delivery_method = :smtp
 
   # Set host to be used by links generated in mailer templates.
   app_url = URI(ENV.fetch("SHOPIFY_APP_URL", "https://ssa.sofenx.com"))
   config.action_mailer.default_url_options = { host: app_url.host, protocol: app_url.scheme }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  smtp_credentials = if ENV["SECRET_KEY_BASE_DUMMY"]
+    { user_name: "asset-build-placeholder", password: "asset-build-placeholder" }
+  else
+    Rails.application.credentials.fetch(:aws_ses_smtp)
+  end
+
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("AWS_SES_SMTP_ADDRESS"),
+    port: ENV.fetch("AWS_SES_SMTP_PORT", 587).to_i,
+    user_name: smtp_credentials.fetch(:user_name),
+    password: smtp_credentials.fetch(:password),
+    authentication: :login,
+    enable_starttls_auto: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
