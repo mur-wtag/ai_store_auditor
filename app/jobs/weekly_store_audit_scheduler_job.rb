@@ -7,7 +7,7 @@ class WeeklyStoreAuditSchedulerJob < ApplicationJob
     Shop.find_each do |shop|
       audit = shop.reserve_audit!(source: "weekly")
       StoreAuditJob.perform_later(audit.id)
-    rescue Shop::BillingRequired, Shop::AuditLimitReached, Shop::AuditInProgress
+    rescue Shop::AuditLimitReached, Shop::AuditInProgress
       next
     end
   end

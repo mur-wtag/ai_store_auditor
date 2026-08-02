@@ -52,10 +52,11 @@ class StoreAuditRunner
   end
 
   def enrich_with_ai
+    return unless audit.shop.billing_active?
     return unless OpenaiAuditEnricher.available?
 
     enricher = OpenaiAuditEnricher.new
-    enricher.enrich(audit.top_findings)
+    enricher.enrich(audit.top_findings(audit.shop.findings_limit))
     audit.update!(ai_model: enricher.model)
   rescue OpenaiAuditEnricher::Error => error
     Rails.logger.warn("Audit #{audit.id} completed without AI enrichment: #{error.message}")

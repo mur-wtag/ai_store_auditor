@@ -12,7 +12,7 @@ The first slice follows the product brief’s recommended launch workflow:
 4. The dashboard shows a 0–100 store score, category scores, critical issues, quick wins, and a capped monthly opportunity scenario.
 5. Optional OpenAI Responses API enrichment adds exact copy and implementation steps to the top ten findings. The audit still works without OpenAI.
 6. Weekly audits are scheduled through Solid Queue in production.
-7. Shopify subscription billing offers Starter ($19/4 audits), Growth ($49/15), and Pro ($99/31), each measured over a rolling 30-day allowance period.
+7. Launch pricing offers Free ($0/1 audit), Starter ($9.99/4), Growth ($19.99/15), and Pro ($39.99/31), each measured over a rolling 30-day allowance period.
 
 No customers, orders, payments, or checkout data are requested by the MVP scopes.
 
@@ -68,7 +68,7 @@ The Shopify CLI build requires a linked `shopify.app.toml`; it is separate from 
 
 The app uses Shopify's GraphQL Billing API and treats `currentAppInstallation.activeSubscriptions` as the source of truth. First-time subscribers receive a 7-day trial. Partner development stores automatically use test charges; live stores use real charges. Plan changes create a replacement subscription that the merchant must approve in Shopify.
 
-The first install audit is a free preview. Later manual and weekly audits share the selected plan allowance, and failed audits do not consume it. Agency is intentionally unavailable until one account can safely manage multiple shop installations.
+The Free plan includes one audit and the top five evidence-backed findings every 30 days. Paid manual and weekly audits share the selected plan allowance, add AI-assisted guidance for the top ten findings, and failed audits do not consume an allowance.
 
 ## Production deployment
 

@@ -12,7 +12,7 @@ module Shopify
 
       audit = shop.reserve_audit!(source: "install")
       StoreAuditJob.perform_later(audit.id)
-    rescue Shop::BillingRequired, Shop::AuditLimitReached, Shop::AuditInProgress
+    rescue Shop::AuditLimitReached, Shop::AuditInProgress
       nil
     end
 

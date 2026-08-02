@@ -33,12 +33,15 @@
     <% elsif current_shop.billing_status == "unrecognized" %>
       <section class="banner banner-critical"><strong>This store has an older Shopify subscription we cannot map to a current plan.</strong><span>Please contact support before changing it.</span></section>
     <% else %>
-      <section class="banner banner-info"><div><strong>Your free preview is saved.</strong><span>Choose a plan to run new audits and keep tracking improvements.</span></div></section>
+      <section class="banner banner-info plan-status">
+        <div><strong>Free is active</strong><span><%= current_shop.audits_used %> of <%= BillingPlan.free.audit_limit %> audits used in the current 30-day period.</span></div>
+        <span class="usage-pill"><%= current_shop.audits_remaining %> remaining</span>
+      </section>
     <% end %>
 
     <section class="plan-grid" aria-label="Subscription plans">
       <% @plans.each do |plan| %>
-        <% current = current_shop.billing_active? && current_shop.billing_plan_key == plan.key %>
+        <% current = plan.key == "free" ? !current_shop.billing_active? : current_shop.billing_active? && current_shop.billing_plan_key == plan.key %>
         <article class="card plan-card <%= 'plan-card-featured' if plan.key == 'growth' %>">
           <% if plan.key == "growth" %><span class="popular-badge">Most popular</span><% end %>
           <p class="eyebrow"><%= plan.name %></p>
@@ -47,6 +50,8 @@
           <ul><% plan.features.each do |feature| %><li><%= feature %></li><% end %></ul>
           <% if current %>
             <button class="button button-secondary" disabled>Current plan</button>
+          <% elsif plan.key == "free" %>
+            <span class="button button-secondary button-disabled">Available after paid plan ends</span>
           <% else %>
             <%= button_to(current_shop.billing_active? ? "Switch to #{plan.name}" : "Start 7-day trial", with_shopify_navigation_params(billing_subscription_path),
               method: :post, params: { plan: plan.key }, class: "button button-primary") %>
@@ -54,15 +59,8 @@
         </article>
       <% end %>
 
-      <article class="card plan-card plan-card-agency">
-        <p class="eyebrow">Agency</p>
-        <h2><span>$299</span> / month</h2>
-        <p class="plan-description">For agencies that need one workspace across multiple client stores.</p>
-        <ul><li>Multi-store account and permissions</li><li>Portfolio-level reporting</li><li>Priority support</li></ul>
-        <span class="button button-secondary button-disabled">Coming after multi-store launch</span>
-      </article>
     </section>
 
-    <p class="billing-footnote">Audit allowances reset every 30 days from subscription activation. Failed audits do not use an allowance. Shopify handles charges, prorating, and plan-change approval.</p>
+    <p class="billing-footnote">Audit allowances reset every 30 days. Failed audits do not use an allowance. Shopify handles paid charges, prorating, and plan-change approval.</p>
   </main>
 </div>

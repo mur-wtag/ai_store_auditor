@@ -5,7 +5,7 @@ class AuditsController < AuthenticatedController
     audit = current_shop.reserve_audit!(source: "manual")
     StoreAuditJob.perform_later(audit.id)
     redirect_to with_shopify_navigation_params(audit_path(audit)), notice: "Store audit started."
-  rescue Shop::BillingRequired, Shop::AuditLimitReached => error
+  rescue Shop::AuditLimitReached => error
     redirect_to with_shopify_navigation_params(plans_path), alert: error.message
   rescue Shop::AuditInProgress => error
     redirect_to with_shopify_navigation_params(root_path), alert: error.message

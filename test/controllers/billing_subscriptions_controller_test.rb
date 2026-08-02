@@ -29,6 +29,15 @@ class BillingSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to navigation_url(plans_path, shop)
   end
 
+  test "does not create a Shopify charge for the free plan" do
+    shop = shops(:other_shop)
+
+    post billing_subscription_url, params: { shop: shop.shopify_domain, plan: "free" }
+
+    assert_redirected_to navigation_url(plans_path, shop)
+    assert_equal "Choose a valid plan.", flash[:alert]
+  end
+
   test "callback grants access only after Shopify reports an active subscription" do
     shop = shops(:other_shop)
     shop.update!(billing_plan_key: nil, billing_status: "none", shopify_app_subscription_id: nil)

@@ -3,7 +3,6 @@
 class Shop < ApplicationRecord
   include ShopifyApp::ShopSessionStorage
 
-  class BillingRequired < StandardError; end
   class AuditLimitReached < StandardError; end
   class AuditInProgress < StandardError; end
 
@@ -46,6 +45,14 @@ class Shop < ApplicationRecord
     billing_active? && billing_trial_ends_at&.future?
   end
 
+  def entitlement_plan
+    billing_active? ? billing_plan : BillingPlan.free
+  end
+
+  def findings_limit
+    billing_active? ? 10 : 5
+  end
+
   def billing_usage_period_start(at: Time.current)
     start_at = billing_usage_period_started_at || billing_subscription_created_at
     return unless start_at
@@ -54,17 +61,31 @@ class Shop < ApplicationRecord
     start_at + periods * 30.days
   end
 
+  def free_usage_period_start(at: Time.current)
+    start_at = audits.where.not(status: "failed").minimum(:created_at) || created_at
+    periods = [ ((at - start_at) / 30.days).floor, 0 ].max
+    start_at + periods * 30.days
+  end
+
+  def usage_period_start(at: Time.current)
+    billing_active? ? billing_usage_period_start(at: at) : free_usage_period_start(at: at)
+  end
+
+  def usage_period_ends_at(at: Time.current)
+    usage_period_start(at: at) + 30.days
+  end
+
   def audits_used(at: Time.current)
-    period_start = billing_usage_period_start(at: at)
+    period_start = usage_period_start(at: at)
     return 0 unless period_start
 
-    audits.where.not(source: "install").where.not(status: "failed").where(created_at: period_start..at).count
+    usage_audits = audits.where.not(status: "failed").where(created_at: period_start..at)
+    usage_audits = usage_audits.where.not(source: "install") if billing_active?
+    usage_audits.count
   end
 
   def audits_remaining(at: Time.current)
-    return 0 unless billing_active?
-
-    [ billing_plan.audit_limit - audits_used(at: at), 0 ].max
+    [ entitlement_plan.audit_limit - audits_used(at: at), 0 ].max
   end
 
   def free_preview_available?
@@ -72,24 +93,21 @@ class Shop < ApplicationRecord
   end
 
   def can_start_audit?
-    !audit_in_progress? && (free_preview_available? || (billing_active? && audits_remaining.positive?))
+    !audit_in_progress? && audits_remaining.positive?
   end
 
   def reserve_audit!(source: "manual")
     with_lock do
       raise AuditInProgress, "A store audit is already running." if audit_in_progress?
 
-      return audits.create!(source: "install") if free_preview_available?
-      raise BillingRequired, "Choose a plan to run another store audit." unless billing_active?
-
-      period_start = billing_usage_period_start
-      if period_start && billing_usage_period_started_at != period_start
+      period_start = usage_period_start
+      if billing_active? && period_start && billing_usage_period_started_at != period_start
         update!(billing_usage_period_started_at: period_start)
       end
 
-      raise AuditLimitReached, "Your #{billing_plan.name} plan audit allowance has been used for this 30-day period." if audits_remaining.zero?
+      raise AuditLimitReached, "Your #{entitlement_plan.name} plan audit allowance has been used for this 30-day period." if audits_remaining.zero?
 
-      audits.create!(source: source)
+      audits.create!(source: free_preview_available? ? "install" : source)
     end
   end
 

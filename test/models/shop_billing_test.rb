@@ -3,20 +3,32 @@
 require "test_helper"
 
 class ShopBillingTest < ActiveSupport::TestCase
-  test "allows one free preview without a subscription" do
+  test "allows one free audit without a subscription" do
     shop = Shop.create!(shopify_domain: "preview-shop.myshopify.com", shopify_token: "token")
 
     audit = shop.reserve_audit!
+    audit.update!(status: "completed")
 
     assert_equal "install", audit.source
-    assert_raises(Shop::AuditInProgress) { shop.reserve_audit! }
+    assert_equal 0, shop.audits_remaining
+    assert_raises(Shop::AuditLimitReached) { shop.reserve_audit! }
   end
 
-  test "requires a subscription after the free preview" do
+  test "applies the free plan after a paid subscription ends" do
     shop = shops(:regular_shop)
     shop.update!(billing_plan_key: nil, billing_status: "none")
 
-    assert_raises(Shop::BillingRequired) { shop.reserve_audit! }
+    assert_equal "Free", shop.entitlement_plan.name
+    assert_equal 0, shop.audits_remaining
+    assert_raises(Shop::AuditLimitReached) { shop.reserve_audit! }
+  end
+
+  test "renews the free audit allowance every 30 days" do
+    shop = Shop.create!(shopify_domain: "returning-free-shop.myshopify.com", shopify_token: "token", created_at: 40.days.ago)
+    shop.audits.create!(source: "install", status: "completed", created_at: 35.days.ago)
+
+    assert_equal 1, shop.audits_remaining
+    assert_equal "manual", shop.reserve_audit!.source
   end
 
   test "enforces the plan allowance and ignores failed audits" do
@@ -38,6 +50,14 @@ class ShopBillingTest < ActiveSupport::TestCase
 
     assert_equal 0, shop.audits_used
     assert_equal 4, shop.audits_remaining
+  end
+
+  test "free plans show five findings while paid plans show ten" do
+    shop = shops(:other_shop)
+    assert_equal 10, shop.findings_limit
+
+    shop.update!(billing_plan_key: nil, billing_status: "none")
+    assert_equal 5, shop.findings_limit
   end
 
   test "refreshes an expired offline token before building an Admin client" do

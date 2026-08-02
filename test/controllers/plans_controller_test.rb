@@ -3,7 +3,7 @@
 require "test_helper"
 
 class PlansControllerTest < ActionDispatch::IntegrationTest
-  test "renders plan prices, allowances, and agency boundary" do
+  test "renders lower launch prices and recurring free plan without agency" do
     billing = Object.new
     billing.define_singleton_method(:reconcile!) { true }
 
@@ -13,8 +13,12 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "article.plan-card", count: 4
-    assert_select "article.plan-card", text: /\$19/
+    assert_select "article.plan-card", text: /\$0/
+    assert_select "article.plan-card", text: /\$9\.99/
+    assert_select "article.plan-card", text: /\$19\.99/
+    assert_select "article.plan-card", text: /\$39\.99/
+    assert_select "article.plan-card", text: /1 full-store audit every 30 days/
     assert_select "article.plan-card", text: /15 full-store audits every 30 days/
-    assert_select "article.plan-card-agency", text: /Coming after multi-store launch/
+    assert_select ".plan-card-agency", count: 0
   end
 end

@@ -7,11 +7,20 @@ class BillingPlan
     end
   end
 
+  FREE = Plan.new(
+    key: "free",
+    name: "Free",
+    price: 0,
+    audit_limit: 1,
+    description: "For merchants who want a monthly storefront health check.",
+    features: [ "1 full-store audit every 30 days", "Top 5 prioritized fixes", "Evidence-backed recommendations" ]
+  )
+
   PLANS = {
     "starter" => Plan.new(
       key: "starter",
       name: "Starter",
-      price: 19,
+      price: "9.99",
       audit_limit: 4,
       description: "For small stores building a reliable improvement routine.",
       features: [ "4 full-store audits every 30 days", "Top 10 prioritized fixes", "AI-assisted copy and implementation guidance" ]
@@ -19,7 +28,7 @@ class BillingPlan
     "growth" => Plan.new(
       key: "growth",
       name: "Growth",
-      price: 49,
+      price: "19.99",
       audit_limit: 15,
       description: "For growing brands that iterate on merchandising every week.",
       features: [ "15 full-store audits every 30 days", "Top 10 prioritized fixes", "AI-assisted copy and implementation guidance" ]
@@ -27,7 +36,7 @@ class BillingPlan
     "pro" => Plan.new(
       key: "pro",
       name: "Pro",
-      price: 99,
+      price: "39.99",
       audit_limit: 31,
       description: "For established brands that want daily storefront oversight.",
       features: [ "31 full-store audits every 30 days", "Top 10 prioritized fixes", "AI-assisted copy and implementation guidance" ]
@@ -38,6 +47,10 @@ class BillingPlan
 
   class << self
     def all
+      [ FREE, *paid ]
+    end
+
+    def paid
       PLANS.values
     end
 
@@ -49,8 +62,12 @@ class BillingPlan
       find(key) || raise(ArgumentError, "Unknown billing plan")
     end
 
+    def free
+      FREE
+    end
+
     def from_subscription_name(name)
-      all.find { |plan| plan.subscription_name == name }
+      paid.find { |plan| plan.subscription_name == name }
     end
   end
 end

@@ -34,14 +34,9 @@
         class: "button button-primary", disabled: !current_shop.can_start_audit?) %>
     </section>
 
-    <% if @audit.present? && !current_shop.billing_active? %>
+    <% if @audit.present? %>
       <section class="banner banner-info">
-        <div><strong>Your free store audit is ready.</strong><span>Choose a plan to rerun the scan and measure improvements.</span></div>
-        <%= link_to "View plans", with_shopify_navigation_params(plans_path), class: "button button-primary" %>
-      </section>
-    <% elsif current_shop.billing_active? %>
-      <section class="banner banner-info">
-        <div><strong><%= current_shop.billing_plan.name %> plan</strong><span><%= current_shop.audits_used %> of <%= current_shop.billing_plan.audit_limit %> audits used in this 30-day period.</span></div>
+        <div><strong><%= current_shop.entitlement_plan.name %> plan</strong><span><%= current_shop.audits_used %> of <%= current_shop.entitlement_plan.audit_limit %> audits used in this 30-day period.</span></div>
         <%= link_to with_shopify_navigation_params(plans_path), class: "usage-pill" do %><strong><%= current_shop.audits_remaining %></strong> remaining<% end %>
       </section>
     <% end %>
@@ -153,7 +148,7 @@
         </div>
 
         <div class="finding-list">
-          <% @audit.top_findings.each_with_index do |finding, index| %>
+          <% @audit.top_findings(current_shop.findings_limit).each_with_index do |finding, index| %>
             <article class="finding card">
               <div class="finding-rank"><%= index + 1 %></div>
               <div class="finding-body">
@@ -176,7 +171,11 @@
                     <ol><% Array(finding.ai_draft["implementation_steps"]).each do |step| %><li><%= step %></li><% end %></ol>
                     <% if finding.ai_draft["caution"].present? %><p class="caution"><%= finding.ai_draft["caution"] %></p><% end %>
                   <% else %>
-                    <p>AI copy is optional. Configure <code>OPENAI_API_KEY</code> and rerun the audit for generated copy; the evidence and recommendation above remain fully usable without it.</p>
+                    <% if current_shop.billing_active? %>
+                      <p>The AI-assisted draft is temporarily unavailable for this finding. The evidence-backed recommendation above remains fully usable, or you can rerun the audit later.</p>
+                    <% else %>
+                      <p>AI-assisted exact copy and implementation steps are included with paid plans. The evidence-backed recommendation above remains fully usable.</p>
+                    <% end %>
                   <% end %>
                   <% if finding.evidence.present? %>
                     <dl class="evidence-list">
