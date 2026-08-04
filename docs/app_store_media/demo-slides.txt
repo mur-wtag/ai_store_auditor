@@ -1,0 +1,13 @@
+file 'feature-image.png'
+duration 40
+file 'dashboard.png'
+duration 40
+file 'prioritized-fixes.png'
+duration 40
+file 'settings.png'
+duration 35
+file 'plans.png'
+duration 45
+file 'feature-image.png'
+duration 40
+file 'feature-image.png'
