@@ -69,7 +69,7 @@ The Shopify CLI build requires a linked `shopify.app.toml`; it is separate from 
 
 The app uses Shopify's GraphQL Billing API and treats `currentAppInstallation.activeSubscriptions` as the source of truth. First-time subscribers receive a 7-day trial. Partner development stores automatically use test charges; live stores use real charges. Plan changes create a replacement subscription that the merchant must approve in Shopify.
 
-The Free plan includes one audit and the top five evidence-backed findings every 30 days. Paid manual and weekly audits share the selected plan allowance, add AI-assisted guidance for the top ten findings, and failed audits do not consume an allowance.
+The Free plan includes one audit and the top five evidence-backed findings every 30 days. Paid manual and weekly audits share the selected plan allowance, add AI-assisted guidance for the top ten findings, and failed audits do not consume an allowance. Merchants can switch between paid plans or cancel the active Shopify subscription and downgrade immediately to Free from the Plans page.
 
 ## Production deployment
 
@@ -98,4 +98,4 @@ Do not reuse Profit Dashboard's Shopify, database, Rails, or OpenAI credentials.
 - Merchant-controlled email notification preferences and digest frequency
 - Analytics proving which recommendations led to measured outcomes
 
-These are not included in the current score or presented as complete. Provider agreements, monitoring, backup retention, pricing QA, and Shopify App Store review remain launch gates.
+These are not included in the current score or presented as complete. Ongoing monitoring, backup-retention operations, pricing QA, and Shopify App Store review remain operational responsibilities.

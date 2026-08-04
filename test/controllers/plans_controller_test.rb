@@ -20,5 +20,7 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_select "article.plan-card", text: /1 full-store audit every 30 days/
     assert_select "article.plan-card", text: /15 full-store audits every 30 days/
     assert_select ".plan-card-agency", count: 0
+    assert_select "button", text: "Downgrade to Free"
+    assert_select "form input[name=_method][value=delete]"
   end
 end

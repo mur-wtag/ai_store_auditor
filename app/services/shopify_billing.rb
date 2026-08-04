@@ -64,6 +64,35 @@ class ShopifyBilling
     raise Error, error.message
   end
 
+  def cancel_subscription!
+    raise Error, "There is no active paid subscription to cancel" unless shop.billing_active?
+
+    subscription_id = shop.shopify_app_subscription_id.presence
+    raise Error, "The active Shopify subscription could not be identified" unless subscription_id
+
+    previous_status = shop.billing_status
+    previous_plan_key = shop.billing_plan_key
+    payload = client.cancel_app_subscription(id: subscription_id, prorate: false)
+    errors = Array(payload["userErrors"])
+    raise Error, errors.map { |error| error["message"] }.join(", ") if errors.any?
+
+    cancelled_subscription = payload["appSubscription"]
+    unless cancelled_subscription&.fetch("id", nil) == subscription_id && cancelled_subscription["status"] == "CANCELLED"
+      raise Error, "Shopify did not confirm that the subscription was cancelled"
+    end
+
+    clear_subscription!
+    shop.reload
+    MerchantEmailNotifications.billing_changed(
+      shop,
+      previous_status: previous_status,
+      previous_plan_key: previous_plan_key
+    )
+    shop
+  rescue ShopifyAdminClient::Error => error
+    raise Error, error.message
+  end
+
   private
 
   attr_reader :shop, :client

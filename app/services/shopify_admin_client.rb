@@ -148,6 +148,19 @@ class ShopifyAdminClient
     response.dig("data", "appSubscriptionCreate") || {}
   end
 
+  def cancel_app_subscription(id:, prorate: false)
+    response = graphql(<<~GRAPHQL, id: id, prorate: prorate)
+      mutation CancelAppSubscription($id: ID!, $prorate: Boolean!) {
+        appSubscriptionCancel(id: $id, prorate: $prorate) {
+          appSubscription { id status }
+          userErrors { field message }
+        }
+      }
+    GRAPHQL
+
+    response.dig("data", "appSubscriptionCancel") || {}
+  end
+
   private
 
   attr_reader :shop_domain, :access_token

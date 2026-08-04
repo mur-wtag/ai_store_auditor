@@ -3,7 +3,15 @@
 require "test_helper"
 
 class ShopifyBillingTest < ActiveSupport::TestCase
-  FakeClient = Struct.new(:subscriptions, :create_payload, :create_arguments, :development_shop, keyword_init: true) do
+  FakeClient = Struct.new(
+    :subscriptions,
+    :create_payload,
+    :create_arguments,
+    :cancel_payload,
+    :cancel_arguments,
+    :development_shop,
+    keyword_init: true
+  ) do
     def active_app_subscriptions
       subscriptions
     end
@@ -13,6 +21,10 @@ class ShopifyBillingTest < ActiveSupport::TestCase
       create_payload
     end
 
+    def cancel_app_subscription(**arguments)
+      self.cancel_arguments = arguments
+      cancel_payload
+    end
 
     def partner_development_shop?
       development_shop == true
@@ -92,5 +104,48 @@ class ShopifyBillingTest < ActiveSupport::TestCase
     end
 
     assert_equal "Billing unavailable", error.message
+  end
+
+  test "cancels an active subscription and moves the shop to free" do
+    shop = shops(:regular_shop)
+    subscription_id = shop.shopify_app_subscription_id
+    client = FakeClient.new(cancel_payload: {
+      "userErrors" => [],
+      "appSubscription" => { "id" => subscription_id, "status" => "CANCELLED" }
+    })
+
+    ShopifyBilling.new(shop, client: client).cancel_subscription!
+
+    assert_equal({ id: subscription_id, prorate: false }, client.cancel_arguments)
+    shop.reload
+    assert_equal "none", shop.billing_status
+    assert_nil shop.billing_plan_key
+    assert_nil shop.shopify_app_subscription_id
+  end
+
+  test "does not clear paid access when Shopify rejects cancellation" do
+    shop = shops(:regular_shop)
+    client = FakeClient.new(cancel_payload: {
+      "userErrors" => [ { "message" => "Subscription cannot be cancelled" } ],
+      "appSubscription" => nil
+    })
+
+    error = assert_raises(ShopifyBilling::Error) do
+      ShopifyBilling.new(shop, client: client).cancel_subscription!
+    end
+
+    assert_equal "Subscription cannot be cancelled", error.message
+    assert shop.reload.billing_active?
+  end
+
+  test "rejects cancellation when the shop is already free" do
+    shop = shops(:other_shop)
+    shop.update!(billing_status: "none", billing_plan_key: nil, shopify_app_subscription_id: nil)
+
+    error = assert_raises(ShopifyBilling::Error) do
+      ShopifyBilling.new(shop, client: FakeClient.new).cancel_subscription!
+    end
+
+    assert_equal "There is no active paid subscription to cancel", error.message
   end
 end

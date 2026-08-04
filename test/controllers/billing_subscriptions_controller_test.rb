@@ -38,6 +38,48 @@ class BillingSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Choose a valid plan.", flash[:alert]
   end
 
+  test "cancels a paid subscription and activates free" do
+    shop = shops(:regular_shop)
+    billing = Object.new
+    billing.define_singleton_method(:cancel_subscription!) do
+      shop.update!(billing_plan_key: nil, billing_status: "none", shopify_app_subscription_id: nil)
+    end
+
+    with_shopify_billing(billing) do
+      delete billing_subscription_url, params: { shop: shop.shopify_domain }
+    end
+
+    assert_redirected_to navigation_url(plans_path, shop)
+    assert_equal "Your paid subscription was cancelled. Free is now active.", flash[:notice]
+    assert_equal "none", shop.reload.billing_status
+  end
+
+  test "does not call Shopify when free is already active" do
+    shop = shops(:other_shop)
+    shop.update!(billing_plan_key: nil, billing_status: "none", shopify_app_subscription_id: nil)
+
+    delete billing_subscription_url, params: { shop: shop.shopify_domain }
+
+    assert_redirected_to navigation_url(plans_path, shop)
+    assert_equal "Free is already active.", flash[:notice]
+  end
+
+  test "keeps the paid plan when cancellation fails" do
+    shop = shops(:regular_shop)
+    billing = Object.new
+    billing.define_singleton_method(:cancel_subscription!) do
+      raise ShopifyBilling::Error, "Billing unavailable"
+    end
+
+    with_shopify_billing(billing) do
+      delete billing_subscription_url, params: { shop: shop.shopify_domain }
+    end
+
+    assert_redirected_to navigation_url(plans_path, shop)
+    assert_equal "Shopify could not cancel the subscription: Billing unavailable", flash[:alert]
+    assert shop.reload.billing_active?
+  end
+
   test "callback grants access only after Shopify reports an active subscription" do
     shop = shops(:other_shop)
     shop.update!(billing_plan_key: nil, billing_status: "none", shopify_app_subscription_id: nil)

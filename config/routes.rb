@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   resources :findings, only: :update
   resource :settings, only: %i[edit update]
   resources :plans, only: :index
-  resource :billing_subscription, only: :create do
+  resource :billing_subscription, only: %i[create destroy] do
     get :callback
   end
 

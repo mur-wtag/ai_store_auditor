@@ -29,4 +29,16 @@ class BillingSubscriptionsController < AuthenticatedController
   rescue ShopifyBilling::Error => error
     redirect_to with_shopify_navigation_params(plans_path), alert: "We could not verify the subscription with Shopify: #{error.message}"
   end
+
+  def destroy
+    unless current_shop.billing_active?
+      redirect_to with_shopify_navigation_params(plans_path), notice: "Free is already active."
+      return
+    end
+
+    ShopifyBilling.new(current_shop).cancel_subscription!
+    redirect_to with_shopify_navigation_params(plans_path), notice: "Your paid subscription was cancelled. Free is now active."
+  rescue ShopifyBilling::Error => error
+    redirect_to with_shopify_navigation_params(plans_path), alert: "Shopify could not cancel the subscription: #{error.message}"
+  end
 end

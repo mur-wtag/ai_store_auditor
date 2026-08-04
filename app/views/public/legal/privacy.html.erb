@@ -2,16 +2,25 @@
 <main class="legal-shell">
   <p class="eyebrow">Sofenx AI Store Auditor</p>
   <h1>Privacy policy</h1>
-  <p>Last updated August 1, 2026. This development draft must be reviewed and completed with the operating company’s legal identity and contact details before public distribution.</p>
+  <p>Last updated August 4, 2026. Sofenx operates Sofenx AI Store Auditor. This policy explains how we handle information when a Shopify merchant installs and uses the app.</p>
   <nav class="legal-nav"><%= link_to "Privacy", privacy_path %><%= link_to "Terms", terms_path %><%= link_to "Support", support_path %></nav>
-  <h2>Data used by the app</h2>
-  <p>The MVP reads store profile information, products, collections, online-store navigation, and public homepage HTML to produce audit findings. It stores the merchant’s configured revenue baseline, scores, evidence, and recommendations.</p>
-  <h2>Data the MVP does not request</h2>
-  <p>The current access scopes do not request customers, orders, payments, or checkout data. Store content sent for optional AI enrichment excludes customer and order information.</p>
-  <h2>Deletion and retention</h2>
-  <p>Shop records and their audits are deleted when an uninstall or shop-redaction webhook is processed. Operational backups and logs require a documented production retention schedule before launch.</p>
+  <h2>Information we process</h2>
+  <p>The app processes the shop domain, store name, merchant contact email, currency, public domain, products, collections, online-store navigation, and public homepage content needed to produce an audit. We store app settings, the merchant’s configured revenue baseline, audit scores, evidence, findings, recommendations, subscription status, and operational email-delivery timestamps.</p>
+  <p>The app does not request access to customers, orders, payments, or checkout data. Do not submit customer personal data, passwords, access tokens, or other secrets through app settings or support requests.</p>
+  <h2>How we use information</h2>
+  <p>We use this information to authenticate the Shopify installation, operate and improve audits, show evidence-backed recommendations, enforce plan allowances, deliver service emails, provide support, prevent abuse, and maintain the security and reliability of the service. We do not sell merchant or store data.</p>
+  <h2>AI processing</h2>
+  <p>For paid-plan guidance, selected finding titles, public resource titles, deterministic explanations, recommendations, and supporting evidence may be sent to OpenAI to improve the wording and implementation guidance. Customer and order data is not included. Requests are configured not to be stored by the model provider for application state, and AI output cannot create findings or change audit scores.</p>
   <h2>Service providers</h2>
-  <p>Shopify supplies store data. OpenAI is optional and receives only the selected store-content findings needed to generate merchant guidance when an API key is configured. Hosting, email, monitoring, and analytics providers must be listed here before launch.</p>
+  <p>We use Shopify for installation, store data, and billing; OpenAI for optional AI-assisted guidance; Amazon Web Services Simple Email Service for transactional email; Cloudflare for DNS, TLS, and network protection; and infrastructure hosting, database, backup, and monitoring providers needed to operate the service. These providers process information only to provide their contracted services and under their own security and privacy obligations.</p>
+  <h2>Deletion and retention</h2>
+  <p>Primary shop records, settings, audits, findings, and Shopify access tokens are deleted when an app-uninstall or Shopify shop-redaction request is processed. Encrypted operational backups may retain deleted data for up to 30 days before rotation. Limited security, delivery, and infrastructure logs may be retained for up to 90 days, unless a longer period is required to investigate abuse, comply with law, or resolve a dispute.</p>
+  <h2>Your choices and rights</h2>
+  <p>Merchants can uninstall the app to stop collection and initiate deletion. Shopify may also send us customer data-access and redaction requests. Because the app does not request customer or order scopes, we normally hold no buyer records to return or redact. You may contact us to request access, correction, or deletion of information associated with your shop, subject to applicable law.</p>
+  <h2>Security and international processing</h2>
+  <p>We use HTTPS, access controls, encrypted credentials, isolated production services, and restricted administrative access. Information may be processed in countries where our service providers operate, with protections required by applicable agreements and law. No internet service can guarantee absolute security.</p>
+  <h2>Changes</h2>
+  <p>We may update this policy as the app or applicable requirements change. We will update the date above and provide additional notice when a material change requires it.</p>
   <h2>Contact</h2>
-  <p>Add the production privacy contact and company address before publishing this policy.</p>
+  <p>Email <a href="mailto:support@sofenx.com">support@sofenx.com</a>. Postal address: Sofenx, House 12, Road 16, Sector 11, Uttara, Dhaka, Bangladesh.</p>
 </main>

@@ -51,7 +51,10 @@
           <% if current %>
             <button class="button button-secondary" disabled>Current plan</button>
           <% elsif plan.key == "free" %>
-            <span class="button button-secondary button-disabled">Available after paid plan ends</span>
+            <%= button_to "Downgrade to Free", with_shopify_navigation_params(billing_subscription_path),
+              method: :delete,
+              class: "button button-secondary",
+              form: { data: { turbo_confirm: "Cancel your paid subscription and switch to Free now? Your paid features will end immediately." } } %>
           <% else %>
             <%= button_to(current_shop.billing_active? ? "Switch to #{plan.name}" : "Start 7-day trial", with_shopify_navigation_params(billing_subscription_path),
               method: :post, params: { plan: plan.key }, class: "button button-primary") %>
@@ -61,6 +64,6 @@
 
     </section>
 
-    <p class="billing-footnote">Audit allowances reset every 30 days. Failed audits do not use an allowance. Shopify handles paid charges, prorating, and plan-change approval.</p>
+    <p class="billing-footnote">Audit allowances reset every 30 days. Failed audits do not use an allowance. Shopify handles paid charges and paid plan-change approval. Downgrading to Free ends paid access immediately and does not issue a prorated refund.</p>
   </main>
 </div>
