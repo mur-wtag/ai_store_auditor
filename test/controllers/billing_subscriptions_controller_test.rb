@@ -17,8 +17,9 @@ class BillingSubscriptionsControllerTest < ActionDispatch::IntegrationTest
       post billing_subscription_url, params: { shop: shop.shopify_domain, plan: "growth" }
     end
 
-    assert_redirected_to "https://other-shop.myshopify.com/admin/charges/confirm"
-    assert_response :see_other
+    assert_response :success
+    assert_select "#redirection-target[data-target]", count: 1
+    assert_includes response.body, "https://other-shop.myshopify.com/admin/charges/confirm"
   end
 
   test "does not recreate the current plan" do

@@ -11,7 +11,7 @@ class BillingSubscriptionsController < AuthenticatedController
     return_url = callback_billing_subscription_url(**shopify_navigation_params)
     confirmation_url = ShopifyBilling.new(current_shop).create_subscription!(plan: plan, return_url: return_url)
 
-    redirect_to confirmation_url, allow_other_host: true, status: :see_other
+    redirect_outside_shopify_iframe(confirmation_url)
   rescue ArgumentError
     redirect_to with_shopify_navigation_params(plans_path), alert: "Choose a valid plan."
   rescue ShopifyBilling::Error => error

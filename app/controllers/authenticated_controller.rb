@@ -33,4 +33,16 @@ class AuthenticatedController < ApplicationController
     separator = path_or_url.include?("?") ? "&" : "?"
     "#{path_or_url}#{separator}#{shopify_navigation_params.to_query}"
   end
+
+  def redirect_outside_shopify_iframe(url)
+    render(
+      "shopify_app/shared/redirect",
+      layout: false,
+      locals: {
+        url: url,
+        current_shopify_domain: current_shop.shopify_domain,
+        is_iframe: true
+      }
+    )
+  end
 end
