@@ -84,6 +84,7 @@ Record one continuous English-language video or add English subtitles. Do not ex
 
 ## Listing media checklist
 
+- App icon asset: `docs/app_store_icon.png` (1200 × 1200 PNG)
 - Square app icon without Shopify trademarks or pricing
 - Feature image focused on the product experience
 - Dashboard overview screenshot

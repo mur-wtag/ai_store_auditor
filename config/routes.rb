@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   resources :plans, only: :index
   resource :billing_subscription, only: %i[create destroy] do
     get :callback
+    get :redirect
   end
 
   scope module: :public do

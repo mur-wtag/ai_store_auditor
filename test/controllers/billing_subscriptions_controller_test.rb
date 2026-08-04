@@ -17,9 +17,23 @@ class BillingSubscriptionsControllerTest < ActionDispatch::IntegrationTest
       post billing_subscription_url, params: { shop: shop.shopify_domain, plan: "growth" }
     end
 
+    assert_response :see_other
+    assert_includes response.location, redirect_billing_subscription_path
+
+    follow_redirect!
+
     assert_response :success
     assert_select "#redirection-target[data-target]", count: 1
     assert_includes response.body, "https://other-shop.myshopify.com/admin/charges/confirm"
+  end
+
+  test "rejects an invalid billing redirect token" do
+    shop = shops(:other_shop)
+
+    get redirect_billing_subscription_url, params: { shop: shop.shopify_domain, token: "invalid" }
+
+    assert_redirected_to navigation_url(plans_path, shop)
+    assert_equal "The Shopify billing approval link expired. Please choose the plan again.", flash[:alert]
   end
 
   test "does not recreate the current plan" do
