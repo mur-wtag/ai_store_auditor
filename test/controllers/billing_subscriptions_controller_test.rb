@@ -8,7 +8,11 @@ class BillingSubscriptionsControllerTest < ActionDispatch::IntegrationTest
     billing = Object.new
     billing.define_singleton_method(:create_subscription!) do |plan:, return_url:|
       raise "wrong plan" unless plan.key == "growth"
-      raise "missing callback" unless return_url.include?("billing_subscription/callback")
+      return_uri = URI.parse(return_url)
+      return_query = Rack::Utils.parse_nested_query(return_uri.query)
+      raise "wrong callback path" unless return_uri.path == "/billing_subscription/callback"
+      raise "wrong callback host" unless return_uri.host == "www.example.com"
+      raise "missing embedded host" unless return_query["host"] == Base64.strict_encode64("#{shop.shopify_domain}/admin")
 
       "https://other-shop.myshopify.com/admin/charges/confirm"
     end

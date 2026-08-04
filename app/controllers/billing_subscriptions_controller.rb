@@ -8,7 +8,7 @@ class BillingSubscriptionsController < AuthenticatedController
       return
     end
 
-    return_url = callback_billing_subscription_url(**shopify_navigation_params)
+    return_url = "#{callback_billing_subscription_url}?#{shopify_navigation_params.to_query}"
     confirmation_url = ShopifyBilling.new(current_shop).create_subscription!(plan: plan, return_url: return_url)
     redirect_token = billing_redirect_verifier.generate(
       { "shop" => current_shop.shopify_domain, "url" => confirmation_url },
