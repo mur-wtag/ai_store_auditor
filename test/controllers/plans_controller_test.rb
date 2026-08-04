@@ -22,5 +22,6 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_select ".plan-card-agency", count: 0
     assert_select "button", text: "Downgrade to Free"
     assert_select "form input[name=_method][value=delete]"
+    assert_select "form[data-turbo=false][target=_top]", count: 2
   end
 end

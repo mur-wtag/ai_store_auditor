@@ -57,7 +57,10 @@
               form: { data: { turbo_confirm: "Cancel your paid subscription and switch to Free now? Your paid features will end immediately." } } %>
           <% else %>
             <%= button_to(current_shop.billing_active? ? "Switch to #{plan.name}" : "Start 7-day trial", with_shopify_navigation_params(billing_subscription_path),
-              method: :post, params: { plan: plan.key }, class: "button button-primary") %>
+              method: :post,
+              params: { plan: plan.key },
+              class: "button button-primary",
+              form: { data: { turbo: false }, target: "_top" }) %>
           <% end %>
         </article>
       <% end %>
