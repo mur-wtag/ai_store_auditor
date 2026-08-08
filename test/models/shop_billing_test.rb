@@ -23,6 +23,38 @@ class ShopBillingTest < ActiveSupport::TestCase
     assert_raises(Shop::AuditLimitReached) { shop.reserve_audit! }
   end
 
+  test "allows only one audit across the introductory trial and plan switches" do
+    shop = Shop.create!(shopify_domain: "trial-shop.myshopify.com", shopify_token: "token")
+    shop.reserve_audit!.update!(status: "completed")
+    shop.update!(
+      billing_plan_key: "starter",
+      billing_status: "active",
+      billing_subscription_created_at: Time.current,
+      billing_trial_ends_at: 7.days.from_now,
+      billing_usage_period_started_at: Time.current
+    )
+
+    assert shop.billing_trial?
+    assert_equal 1, shop.audit_limit
+    assert_equal 1, shop.audits_used
+    assert_equal 0, shop.audits_remaining
+    assert_raises(Shop::AuditLimitReached) { shop.reserve_audit! }
+
+    shop.update!(billing_plan_key: "pro")
+
+    assert_equal 1, shop.audit_limit
+    assert_equal 0, shop.audits_remaining
+    assert_raises(Shop::AuditLimitReached) { shop.reserve_audit! }
+  end
+
+  test "applies the selected plan allowance after the introductory trial" do
+    shop = shops(:other_shop)
+    shop.update!(billing_trial_ends_at: 1.minute.ago)
+
+    assert_not shop.billing_trial?
+    assert_equal 4, shop.audit_limit
+  end
+
   test "renews the free audit allowance every 30 days" do
     shop = Shop.create!(shopify_domain: "returning-free-shop.myshopify.com", shopify_token: "token", created_at: 40.days.ago)
     shop.audits.create!(source: "install", status: "completed", created_at: 35.days.ago)

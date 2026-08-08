@@ -15,7 +15,7 @@
       <div>
         <p class="eyebrow">Simple monthly pricing</p>
         <h1>Choose how often you want a fresh action plan.</h1>
-        <p class="lede">Every paid plan includes a 7-day trial for first-time subscribers. Charges and plan changes are approved securely in Shopify.</p>
+        <p class="lede">Every paid plan includes a 7-day trial for first-time subscribers, with one audit total during the trial. Charges and plan changes are approved securely in Shopify.</p>
       </div>
     </section>
 
@@ -26,7 +26,7 @@
       <section class="banner banner-info plan-status">
         <div>
           <strong><%= current_shop.billing_plan.name %> is active<%= " (test charge)" if current_shop.billing_test? %></strong>
-          <span><%= current_shop.audits_used %> of <%= current_shop.billing_plan.audit_limit %> audits used in the current 30-day period.</span>
+          <span><%= current_shop.audits_used %> of <%= current_shop.audit_limit %> audits used <%= current_shop.billing_trial? ? "during the introductory trial" : "in the current 30-day period" %>.</span>
         </div>
         <span class="usage-pill"><%= current_shop.audits_remaining %> remaining</span>
       </section>
@@ -64,6 +64,6 @@
 
     </section>
 
-    <p class="billing-footnote">Audit allowances reset every 30 days. Failed audits do not use an allowance. Shopify handles paid charges and paid plan-change approval. Downgrading to Free ends paid access immediately and does not issue a prorated refund.</p>
+    <p class="billing-footnote">The introductory trial includes one audit total across all plan selections. After the trial, audit allowances reset every 30 days. Failed audits do not use an allowance. Shopify handles paid charges and paid plan-change approval. Downgrading to Free ends paid access immediately and does not issue a prorated refund.</p>
   </main>
 </div>

@@ -36,7 +36,7 @@
 
     <% if @audit.present? %>
       <section class="banner banner-info">
-        <div><strong><%= current_shop.entitlement_plan.name %> plan</strong><span><%= current_shop.audits_used %> of <%= current_shop.entitlement_plan.audit_limit %> audits used in this 30-day period.</span></div>
+        <div><strong><%= current_shop.entitlement_plan.name %> plan</strong><span><%= current_shop.audits_used %> of <%= current_shop.audit_limit %> audits used <%= current_shop.billing_trial? ? "during the introductory trial" : "in this 30-day period" %>.</span></div>
         <%= link_to with_shopify_navigation_params(plans_path), class: "usage-pill" do %><strong><%= current_shop.audits_remaining %></strong> remaining<% end %>
       </section>
     <% end %>

@@ -22,6 +22,7 @@ class Audit < ApplicationRecord
 
   def top_findings(limit = 10)
     findings.order(Arel.sql("CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END"),
-      estimated_monthly_revenue_cents: :desc).limit(limit)
+      estimated_monthly_revenue_cents: :desc,
+      id: :asc).limit(limit)
   end
 end

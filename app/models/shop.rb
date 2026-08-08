@@ -41,8 +41,8 @@ class Shop < ApplicationRecord
     billing_status == "active" && billing_plan.present?
   end
 
-  def billing_trial?
-    billing_active? && billing_trial_ends_at&.future?
+  def billing_trial?(at: Time.current)
+    billing_active? && billing_trial_ends_at&.after?(at)
   end
 
   def entitlement_plan
@@ -76,6 +76,10 @@ class Shop < ApplicationRecord
   end
 
   def audits_used(at: Time.current)
+    if billing_trial?(at: at)
+      return audits.where.not(status: "failed").where(created_at: ..at).count
+    end
+
     period_start = usage_period_start(at: at)
     return 0 unless period_start
 
@@ -84,8 +88,12 @@ class Shop < ApplicationRecord
     usage_audits.count
   end
 
+  def audit_limit(at: Time.current)
+    billing_trial?(at: at) ? BillingPlan::TRIAL_AUDIT_LIMIT : entitlement_plan.audit_limit
+  end
+
   def audits_remaining(at: Time.current)
-    [ entitlement_plan.audit_limit - audits_used(at: at), 0 ].max
+    [ audit_limit(at: at) - audits_used(at: at), 0 ].max
   end
 
   def free_preview_available?
@@ -105,7 +113,14 @@ class Shop < ApplicationRecord
         update!(billing_usage_period_started_at: period_start)
       end
 
-      raise AuditLimitReached, "Your #{entitlement_plan.name} plan audit allowance has been used for this 30-day period." if audits_remaining.zero?
+      if audits_remaining.zero?
+        message = if billing_trial?
+          "Your one-audit introductory trial allowance has been used. Paid plan allowances become available after the trial."
+        else
+          "Your #{entitlement_plan.name} plan audit allowance has been used for this 30-day period."
+        end
+        raise AuditLimitReached, message
+      end
 
       audits.create!(source: free_preview_available? ? "install" : source)
     end

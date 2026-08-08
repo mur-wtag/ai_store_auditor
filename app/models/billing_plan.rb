@@ -44,6 +44,7 @@ class BillingPlan
   }.freeze
 
   TRIAL_DAYS = 7
+  TRIAL_AUDIT_LIMIT = 1
 
   class << self
     def all
